@@ -53,6 +53,11 @@ The interface is a single self-contained `public/index.html` with:
 - One-click sample presets, clipboard paste and shareable-report copy.
 - No framework, no bundler, no CDN JavaScript, no build step for the frontend.
 
+## Demo video
+
+A 60-second automated walkthrough is included as [`demo.mp4`](demo.mp4), with a
+timed voiceover script in [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md).
+
 ---
 
 ## Architecture
