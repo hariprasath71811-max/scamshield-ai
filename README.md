@@ -8,6 +8,8 @@ It is built for online shoppers — not security analysts.
 
 > Built for **Ostad Presents YUnet AIgnite Buildathon 2026** · National AI Hackathon for B2C Solutions.
 
+**Repository:** [github.com/hariprasath71811-max/scamshield-ai](https://github.com/hariprasath71811-max/scamshield-ai)
+
 ![ScamShield AI home screen](docs/screenshots/home.png)
 
 ---
@@ -326,16 +328,25 @@ Fly.io, Azure Container Apps and similar platforms can route traffic to it.
 
 ## Git & GitHub
 
-This folder is already an initialized Git repository with the initial commit on the
-`main` branch. To publish it, create an empty repository on GitHub and run:
+Published at **[github.com/hariprasath71811-max/scamshield-ai](https://github.com/hariprasath71811-max/scamshield-ai)**.
+The repository is public, uses `main` as the default branch, and contains the initial
+project commit.
 
 ```bash
-git remote add origin https://github.com/<your-username>/scamshield-ai.git
-git push -u origin main
+git clone https://github.com/hariprasath71811-max/scamshield-ai.git
+cd scamshield-ai
 ```
 
-Replace `<your-username>` and the repository name with your own. The included
-`.gitignore` keeps compiled classes and local noise out of version control.
+To publish later changes:
+
+```bash
+git add .
+git commit -m "describe your change"
+git push
+```
+
+The included `.gitignore` keeps compiled classes and local noise out of version
+control.
 
 ---
 
