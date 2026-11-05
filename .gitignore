@@ -1,0 +1,25 @@
+# Build output
+out/
+*.class
+*.jar
+
+# Local configuration
+.env
+.env.*
+!.env.example
+
+# Operating-system noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor noise
+.idea/
+.vscode/
+*.iml
+*.swp
+
+# Local logs and temporary files
+*.log
+tmp/
+coverage/

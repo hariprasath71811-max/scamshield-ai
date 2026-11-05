@@ -1,0 +1,3439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#05070e" />
+  <meta name="description" content="ScamShield AI is an explainable consumer fraud and phishing sentinel. Paste a suspicious link, review or message and get an instant threat index with actionable safety guidance." />
+  <title>ScamShield AI — Consumer Fraud &amp; Phishing Sentinel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%235ef0a7'/%3E%3Cstop offset='1' stop-color='%2322e6ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath fill='%23070b15' d='M0 0h64v64H0z'/%3E%3Cpath fill='url(%23g)' d='M32 6 53 14v15c0 13-8.8 23.2-21 29C19.8 52.2 11 42 11 29V14L32 6Z'/%3E%3Cpath fill='%23070b15' d='m23 31 6 6 13-14-3-3-10 11-3-3z'/%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --bg: #05070e;
+      --bg-soft: #080c16;
+      --panel: rgba(12, 18, 32, 0.76);
+      --panel-solid: #0c1220;
+      --stroke: rgba(148, 177, 220, 0.14);
+      --stroke-bright: rgba(125, 238, 255, 0.35);
+      --text: #f3f7ff;
+      --text-soft: #c3cede;
+      --muted: #7f8da6;
+      --faint: #53617a;
+      --cyan: #22e6ff;
+      --mint: #5ef0a7;
+      --violet: #9f7cff;
+      --blue: #4f8dff;
+      --amber: #ffc857;
+      --red: #ff4d6d;
+      --risk: var(--cyan);
+      --risk-soft: rgba(34, 230, 255, 0.16);
+      --font-display: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --radius-xl: 30px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --max: 1240px;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-display);
+      font-size: 16px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 48% 36% at 14% 8%, rgba(34, 230, 255, 0.11), transparent 64%),
+        radial-gradient(ellipse 44% 38% at 88% 16%, rgba(159, 124, 255, 0.13), transparent 66%),
+        radial-gradient(ellipse 52% 44% at 66% 86%, rgba(21, 96, 160, 0.12), transparent 66%),
+        linear-gradient(180deg, #05070e 0%, #060913 48%, #04060c 100%);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      opacity: 0.42;
+      background-image:
+        linear-gradient(rgba(90, 135, 190, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(90, 135, 190, 0.055) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: radial-gradient(ellipse 74% 68% at 50% 30%, #000 8%, transparent 82%);
+      -webkit-mask-image: radial-gradient(ellipse 74% 68% at 50% 30%, #000 8%, transparent 82%);
+    }
+
+    ::selection { background: rgba(34, 230, 255, 0.28); color: #fff; }
+
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; }
+    a { color: inherit; text-decoration: none; }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    .page-width {
+      width: min(var(--max), calc(100% - 48px));
+      margin-inline: auto;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    [hidden] { display: none !important; }
+
+    #network {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: -100px;
+      left: 12px;
+      z-index: 100;
+      padding: 10px 16px;
+      border-radius: 10px;
+      background: var(--cyan);
+      color: #001018;
+      transition: top 0.2s;
+    }
+    .skip-link:focus { top: 12px; }
+
+    /* ---------- Header ---------- */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      border-bottom: 1px solid rgba(165, 195, 235, 0.09);
+      background: linear-gradient(180deg, rgba(5, 7, 14, 0.9), rgba(5, 7, 14, 0.55));
+      backdrop-filter: blur(22px) saturate(130%);
+      -webkit-backdrop-filter: blur(22px) saturate(130%);
+    }
+
+    .nav {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      flex-shrink: 0;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: linear-gradient(145deg, rgba(34, 230, 255, 0.1), rgba(94, 240, 167, 0.05));
+      border: 1px solid rgba(94, 240, 167, 0.22);
+      box-shadow: 0 0 26px rgba(94, 240, 167, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+    }
+
+    .brand-mark svg { width: 25px; height: 25px; }
+
+    .brand-name {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-name em {
+      font-style: normal;
+      margin-left: 3px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1px;
+      vertical-align: 2px;
+      color: var(--mint);
+      border: 1px solid rgba(94, 240, 167, 0.3);
+      border-radius: 5px;
+      padding: 2px 5px;
+      box-shadow: 0 0 14px rgba(94, 240, 167, 0.12);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 12px;
+    }
+
+    .nav-link {
+      position: relative;
+      padding: 9px 13px;
+      border-radius: 9px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      transition: color 0.2s, background 0.2s;
+    }
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      left: 13px; right: 13px; bottom: 5px;
+      height: 1px;
+      background: var(--cyan);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.35s var(--ease);
+    }
+    .nav-link:hover { color: var(--text); background: rgba(255, 255, 255, 0.03); }
+    .nav-link:hover::after { transform: scaleX(1); }
+
+    .nav-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .engine-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 34px;
+      padding: 0 13px;
+      border-radius: 99px;
+      color: #c9f9e3;
+      background: rgba(94, 240, 167, 0.055);
+      border: 1px solid rgba(94, 240, 167, 0.18);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      white-space: nowrap;
+    }
+
+    .engine-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--mint);
+      box-shadow: 0 0 10px var(--mint);
+      animation: enginePulse 2.4s infinite;
+    }
+
+    @keyframes enginePulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 10px var(--mint); }
+      50% { opacity: 0.55; box-shadow: 0 0 3px var(--mint); }
+    }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 38px;
+      padding: 0 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(34, 230, 255, 0.22);
+      background: rgba(34, 230, 255, 0.06);
+      color: #dffbff;
+      font-size: 12px;
+      font-weight: 700;
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+    .nav-cta:hover {
+      background: rgba(34, 230, 255, 0.11);
+      border-color: rgba(34, 230, 255, 0.4);
+      box-shadow: 0 0 24px rgba(34, 230, 255, 0.12);
+    }
+    .nav-cta svg { width: 14px; height: 14px; }
+
+    /* ---------- Hero & copy ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 0.86fr) minmax(520px, 1.14fr);
+      align-items: start;
+      gap: clamp(34px, 5vw, 80px);
+      padding-top: clamp(48px, 7vh, 86px);
+      padding-bottom: 58px;
+    }
+
+    .hero-copy {
+      padding-top: 20px;
+      position: relative;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 30px;
+      padding: 6px 11px 6px 8px;
+      border-radius: 99px;
+      border: 1px solid rgba(34, 230, 255, 0.17);
+      background: rgba(34, 230, 255, 0.045);
+      color: #cdeef6;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      animation: fadeUp 0.7s var(--ease) both;
+    }
+
+    .eyebrow-badge {
+      display: inline-flex;
+      align-items: center;
+      height: 18px;
+      padding: 0 6px;
+      border-radius: 4px;
+      color: #071018;
+      background: linear-gradient(120deg, var(--mint), var(--cyan));
+      font-size: 8px;
+      letter-spacing: 0.08em;
+    }
+
+    .hero-title {
+      margin: 24px 0 22px;
+      font-size: clamp(48px, 5.3vw, 76px);
+      line-height: 0.98;
+      letter-spacing: -0.065em;
+      font-weight: 800;
+      animation: fadeUp 0.8s 0.08s var(--ease) both;
+    }
+
+    .hero-title .dim { color: #dfe7f4; }
+    .hero-title .grad {
+      display: inline-block;
+      background: linear-gradient(102deg, #ffffff 4%, #85efff 36%, #6ef2b5 63%, #b79cff 96%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 26px rgba(34, 230, 255, 0.14));
+    }
+
+    .hero-sub {
+      max-width: 520px;
+      margin-bottom: 28px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.72;
+      letter-spacing: -0.015em;
+      animation: fadeUp 0.8s 0.16s var(--ease) both;
+    }
+    .hero-sub strong { color: #dce7f5; font-weight: 600; }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 34px;
+      animation: fadeUp 0.8s 0.23s var(--ease) both;
+    }
+
+    .primary-link, .quiet-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      height: 48px;
+      padding: 0 20px;
+      border-radius: 11px;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      transition: all 0.25s var(--ease);
+    }
+
+    .primary-link {
+      color: #031019;
+      background: linear-gradient(118deg, #68f5bc, #34e4f4);
+      border: 1px solid rgba(160, 255, 230, 0.55);
+      box-shadow: 0 10px 36px rgba(46, 231, 209, 0.17), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+    .primary-link:hover { transform: translateY(-2px); box-shadow: 0 16px 42px rgba(46, 231, 209, 0.25); }
+    .primary-link svg { width: 15px; height: 15px; }
+
+    .quiet-link {
+      color: var(--text-soft);
+      border: 1px solid var(--stroke);
+      background: rgba(255, 255, 255, 0.025);
+    }
+    .quiet-link:hover { border-color: rgba(159, 124, 255, 0.34); background: rgba(159, 124, 255, 0.06); }
+    .quiet-link svg { width: 15px; height: 15px; }
+
+    .trust-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      max-width: 480px;
+      animation: fadeUp 0.8s 0.3s var(--ease) both;
+    }
+
+    .trust-stat {
+      min-height: 80px;
+      padding: 13px 14px;
+      border: 1px solid rgba(154, 184, 224, 0.11);
+      border-radius: 14px;
+      background: linear-gradient(145deg, rgba(16, 23, 39, 0.65), rgba(8, 12, 22, 0.38));
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .trust-stat::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 14px; right: 14px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(34, 230, 255, 0.25), transparent);
+    }
+
+    .trust-value {
+      display: block;
+      margin-bottom: 4px;
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      color: #eaf5ff;
+    }
+    .trust-value span { font-size: 11px; color: var(--mint); }
+    .trust-label {
+      display: block;
+      color: #72829b;
+      font-size: 10px;
+      line-height: 1.4;
+      font-weight: 600;
+    }
+
+    .hero-foot {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 24px;
+      color: #6d7c96;
+      font-size: 11px;
+      animation: fadeUp 0.8s 0.36s var(--ease) both;
+    }
+    .hero-foot svg { width: 14px; height: 14px; color: #5d7390; }
+    .hero-foot .dot { width: 3px; height: 3px; border-radius: 50%; background: #35435b; }
+
+    .signal-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 26px;
+      animation: fadeUp 0.8s 0.39s var(--ease) both;
+    }
+    .signal-tag {
+      padding: 5px 9px;
+      border-radius: 6px;
+      border: 1px solid rgba(159, 124, 255, 0.13);
+      background: rgba(159, 124, 255, 0.04);
+      color: #9ba8c2;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.035em;
+    }
+
+    .hero-orbit {
+      position: absolute;
+      width: 540px; height: 540px;
+      left: -260px; top: 40px;
+      border: 1px dashed rgba(111, 174, 217, 0.08);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: -1;
+      animation: slowSpin 80s linear infinite;
+    }
+    .hero-orbit::before, .hero-orbit::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(111, 174, 217, 0.055);
+    }
+    .hero-orbit::before { inset: 64px; }
+    .hero-orbit::after { inset: 142px; }
+    @keyframes slowSpin { to { transform: rotate(360deg); } }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ---------- Analyzer panel ---------- */
+    .analyzer-shell { position: relative; min-width: 0; }
+
+    .analyzer-panel {
+      position: relative;
+      border-radius: var(--radius-xl);
+      padding: 1px;
+      background: linear-gradient(145deg, rgba(94, 240, 167, 0.22), rgba(103, 152, 210, 0.12) 35%, rgba(159, 124, 255, 0.17));
+      box-shadow:
+        0 40px 100px rgba(0, 0, 0, 0.48),
+        0 0 0 1px rgba(255, 255, 255, 0.025),
+        0 0 80px rgba(34, 230, 255, 0.045);
+      animation: panelIn 0.9s 0.16s var(--ease) both;
+      isolation: isolate;
+    }
+
+    .analyzer-inner {
+      position: relative;
+      overflow: hidden;
+      min-height: 535px;
+      padding: clamp(22px, 3vw, 32px);
+      border-radius: calc(var(--radius-xl) - 1px);
+      background:
+        radial-gradient(ellipse 80% 55% at 88% 2%, rgba(34, 230, 255, 0.07), transparent 58%),
+        radial-gradient(ellipse 68% 54% at 8% 100%, rgba(159, 124, 255, 0.055), transparent 60%),
+        linear-gradient(158deg, rgba(16, 23, 40, 0.9), rgba(7, 11, 21, 0.94));
+      backdrop-filter: blur(28px) saturate(135%);
+      -webkit-backdrop-filter: blur(28px) saturate(135%);
+    }
+
+    .analyzer-inner::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.24;
+      background-image: linear-gradient(rgba(158, 198, 245, 0.045) 1px, transparent 1px);
+      background-size: 100% 34px;
+      mask-image: linear-gradient(to bottom, #000, transparent 62%);
+      -webkit-mask-image: linear-gradient(to bottom, #000, transparent 62%);
+    }
+
+    .panel-head {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 26px;
+    }
+
+    .panel-kicker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--mint);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+    }
+    .panel-kicker .live-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--mint);
+      box-shadow: 0 0 12px var(--mint);
+      animation: enginePulse 2s infinite;
+    }
+
+    .local-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 26px;
+      padding: 0 9px;
+      border-radius: 6px;
+      border: 1px solid rgba(148, 177, 220, 0.15);
+      background: rgba(255, 255, 255, 0.025);
+      color: #8c9bb4;
+      font-family: var(--font-mono);
+      font-size: 8px;
+      letter-spacing: 0.08em;
+    }
+    .local-chip svg { width: 11px; height: 11px; }
+
+    .analyzer-title {
+      position: relative;
+      margin-bottom: 6px;
+      font-size: clamp(24px, 2.4vw, 32px);
+      line-height: 1.14;
+      letter-spacing: -0.045em;
+      font-weight: 800;
+    }
+    .analyzer-title .thin { color: #9dabc3; font-weight: 500; }
+
+    .analyzer-lede {
+      position: relative;
+      margin: 0 0 20px;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+
+    .type-switch {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      padding: 4px;
+      margin-bottom: 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 177, 220, 0.12);
+      background: rgba(5, 9, 17, 0.62);
+    }
+
+    .type-btn {
+      position: relative;
+      z-index: 1;
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: #7786a0;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      transition: color 0.22s, background 0.22s, box-shadow 0.22s;
+    }
+    .type-btn svg { width: 14px; height: 14px; opacity: 0.7; transition: opacity 0.2s; }
+    .type-btn:hover { color: #cad6e8; }
+    .type-btn[aria-selected="true"] {
+      color: #eaffff;
+      background: linear-gradient(145deg, rgba(34, 230, 255, 0.12), rgba(94, 240, 167, 0.055));
+      box-shadow: inset 0 0 0 1px rgba(34, 230, 255, 0.18), 0 4px 16px rgba(0, 0, 0, 0.25);
+    }
+    .type-btn[aria-selected="true"] svg { opacity: 1; color: var(--mint); }
+
+    .input-shell {
+      position: relative;
+      border: 1px solid rgba(148, 177, 220, 0.16);
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(7, 12, 22, 0.82), rgba(8, 13, 24, 0.62));
+      transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+      overflow: hidden;
+    }
+    .input-shell:focus-within {
+      border-color: rgba(34, 230, 255, 0.46);
+      box-shadow: 0 0 0 3px rgba(34, 230, 255, 0.07), 0 0 34px rgba(34, 230, 255, 0.055);
+    }
+    .input-shell.is-error { border-color: rgba(255, 77, 109, 0.54); box-shadow: 0 0 0 3px rgba(255, 77, 109, 0.07); }
+
+    .input-top {
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 7px 11px 0 14px;
+    }
+    .input-label {
+      color: #8090a9;
+      font-family: var(--font-mono);
+      font-size: 8px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .input-tools { display: flex; align-items: center; gap: 4px; }
+
+    .text-tool {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border: 0;
+      background: transparent;
+      padding: 4px 6px;
+      border-radius: 5px;
+      color: #65758f;
+      font-size: 9px;
+      font-weight: 600;
+      transition: color 0.2s, background 0.2s;
+    }
+    .text-tool:hover { color: var(--cyan); background: rgba(34, 230, 255, 0.05); }
+    .text-tool svg { width: 11px; height: 11px; }
+
+    #contentInput {
+      display: block;
+      width: 100%;
+      min-height: 152px;
+      max-height: 300px;
+      padding: 8px 14px 12px;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: #e6eefc;
+      font-size: 13px;
+      line-height: 1.66;
+      resize: vertical;
+      caret-color: var(--cyan);
+    }
+    #contentInput::placeholder { color: #51617a; }
+
+    .input-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 12px;
+      border-top: 1px solid rgba(148, 177, 220, 0.08);
+      background: rgba(255, 255, 255, 0.012);
+    }
+    .char-count {
+      color: #586880;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.03em;
+    }
+    .key-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #4f6078;
+      font-size: 9px;
+    }
+    .key-hint kbd {
+      padding: 2px 5px;
+      border: 1px solid rgba(148, 177, 220, 0.16);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.025);
+      color: #7b8aa3;
+      font-family: var(--font-mono);
+      font-size: 8px;
+    }
+
+    .input-error {
+      min-height: 16px;
+      margin: 7px 2px 0;
+      color: #ff8fa3;
+      font-size: 10px;
+      line-height: 1.4;
+      opacity: 0;
+      transform: translateY(-3px);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .input-error.show { opacity: 1; transform: translateY(0); }
+
+    .samples-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 17px 0 9px;
+    }
+    .samples-label {
+      color: #8291a9;
+      font-family: var(--font-mono);
+      font-size: 8.5px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .auto-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #5f6f88;
+      font-size: 9px;
+    }
+    .auto-label::before {
+      content: "";
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--violet);
+      box-shadow: 0 0 7px var(--violet);
+    }
+
+    .samples-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .sample-card {
+      position: relative;
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 177, 220, 0.11);
+      background: rgba(255, 255, 255, 0.018);
+      color: #a8b5c9;
+      text-align: left;
+      transition: transform 0.25s var(--ease), border-color 0.25s, background 0.25s;
+      transform-style: preserve-3d;
+    }
+    .sample-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(34, 230, 255, 0.26);
+      background: rgba(34, 230, 255, 0.035);
+    }
+    .sample-card.is-active {
+      border-color: rgba(34, 230, 255, 0.36);
+      background: rgba(34, 230, 255, 0.05);
+      box-shadow: 0 0 22px rgba(34, 230, 255, 0.055);
+    }
+
+    .sample-icon {
+      width: 28px; height: 28px;
+      flex: 0 0 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 177, 220, 0.11);
+      background: rgba(255, 255, 255, 0.025);
+    }
+    .sample-icon svg { width: 14px; height: 14px; }
+    .sample-icon.danger { color: #ff8498; border-color: rgba(255, 77, 109, 0.18); background: rgba(255, 77, 109, 0.05); }
+    .sample-icon.warning { color: #ffcf76; border-color: rgba(255, 200, 87, 0.17); background: rgba(255, 200, 87, 0.045); }
+    .sample-icon.safe { color: #76f5bb; border-color: rgba(94, 240, 167, 0.18); background: rgba(94, 240, 167, 0.045); }
+
+    .sample-copy { min-width: 0; flex: 1; }
+    .sample-name {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #cbd6e6;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: -0.005em;
+    }
+    .sample-type {
+      display: block;
+      margin-top: 1px;
+      color: #57677e;
+      font-family: var(--font-mono);
+      font-size: 7.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .sample-arrow {
+      width: 18px; height: 18px;
+      flex: 0 0 18px;
+      display: grid;
+      place-items: center;
+      color: #3e5068;
+      transition: color 0.2s, transform 0.2s;
+    }
+    .sample-card:hover .sample-arrow { color: var(--cyan); transform: translate(1px, -1px); }
+    .sample-arrow svg { width: 12px; height: 12px; }
+
+    .scan-btn {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      margin-top: 17px;
+      border: 1px solid rgba(153, 255, 225, 0.58);
+      border-radius: 12px;
+      background: linear-gradient(112deg, #62f2bb 0%, #36e7ed 54%, #71dcff 100%);
+      color: #031018;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      box-shadow:
+        0 14px 38px rgba(38, 228, 210, 0.18),
+        0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+        0 1px 0 rgba(255, 255, 255, 0.65) inset;
+      transition: transform 0.25s var(--ease), box-shadow 0.25s, filter 0.25s;
+    }
+    .scan-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 46px rgba(38, 228, 210, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+      filter: saturate(1.08);
+    }
+    .scan-btn:active:not(:disabled) { transform: translateY(0) scale(0.992); }
+    .scan-btn:disabled { filter: saturate(0.7) brightness(0.85); }
+    .scan-btn svg { width: 17px; height: 17px; }
+    .scan-btn::after {
+      content: "";
+      position: absolute;
+      top: -40%; bottom: -40%;
+      width: 44%;
+      left: -60%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.48), transparent);
+      transform: skewX(-18deg);
+      transition: left 0.7s var(--ease);
+    }
+    .scan-btn:hover::after { left: 120%; }
+
+    .panel-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 14px;
+      color: #4e6079;
+      font-size: 9px;
+    }
+    .panel-foot span { display: inline-flex; align-items: center; gap: 5px; }
+    .panel-foot svg { width: 11px; height: 11px; color: #60758e; }
+    .panel-foot .secure { color: #6f8e87; }
+
+    .scan-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 8;
+      display: grid;
+      place-items: center;
+      padding: 26px;
+      border-radius: calc(var(--radius-xl) - 1px);
+      background: rgba(5, 9, 17, 0.81);
+      backdrop-filter: blur(18px) saturate(120%);
+      -webkit-backdrop-filter: blur(18px) saturate(120%);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.28s, visibility 0.28s;
+    }
+    .scan-overlay.show { opacity: 1; visibility: visible; }
+
+    .scan-overlay-box {
+      width: 100%;
+      max-width: 340px;
+      text-align: center;
+    }
+
+    .radar {
+      position: relative;
+      width: 126px;
+      height: 126px;
+      margin: 0 auto 24px;
+      border-radius: 50%;
+      border: 1px solid rgba(34, 230, 255, 0.2);
+      background:
+        radial-gradient(circle, rgba(34, 230, 255, 0.11), transparent 66%),
+        repeating-radial-gradient(circle, rgba(34, 230, 255, 0.16) 0 1px, transparent 1px 22px);
+      box-shadow: 0 0 48px rgba(34, 230, 255, 0.12), inset 0 0 34px rgba(34, 230, 255, 0.07);
+    }
+    .radar::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, transparent 0deg, rgba(34, 230, 255, 0.42) 38deg, transparent 78deg, transparent 360deg);
+      animation: radarSpin 1.8s linear infinite;
+      mask-image: radial-gradient(circle, transparent 31%, #000 32%);
+      -webkit-mask-image: radial-gradient(circle, transparent 31%, #000 32%);
+    }
+    .radar::after {
+      content: "";
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 19px; height: 19px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--mint);
+      box-shadow: 0 0 18px var(--mint), 0 0 50px rgba(94, 240, 167, 0.5);
+      animation: corePulse 1.2s ease-in-out infinite;
+    }
+    @keyframes radarSpin { to { transform: rotate(360deg); } }
+    @keyframes corePulse { 0%, 100% { transform: translate(-50%, -50%) scale(0.85); } 50% { transform: translate(-50%, -50%) scale(1.15); } }
+
+    .scan-title {
+      margin: 0 0 4px;
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    .scan-sub {
+      margin: 0 0 18px;
+      color: #7486a1;
+      font-size: 10.5px;
+      font-family: var(--font-mono);
+      letter-spacing: 0.04em;
+    }
+
+    .scan-steps {
+      display: grid;
+      gap: 7px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      text-align: left;
+    }
+    .scan-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 11px;
+      border: 1px solid rgba(148, 177, 220, 0.08);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.015);
+      color: #637590;
+      font-size: 10px;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .scan-step .step-marker {
+      width: 16px; height: 16px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 16px;
+      border-radius: 50%;
+      border: 1px solid rgba(148, 177, 220, 0.18);
+      color: transparent;
+      transition: all 0.25s;
+    }
+    .scan-step .step-marker svg { width: 9px; height: 9px; }
+    .scan-step.active { color: #d4e2f2; border-color: rgba(34, 230, 255, 0.2); background: rgba(34, 230, 255, 0.035); }
+    .scan-step.active .step-marker {
+      border-color: rgba(34, 230, 255, 0.45);
+      box-shadow: 0 0 12px rgba(34, 230, 255, 0.2);
+      animation: stepPulse 1s infinite;
+    }
+    .scan-step.done { color: #84ecbe; }
+    .scan-step.done .step-marker { border-color: rgba(94, 240, 167, 0.4); background: rgba(94, 240, 167, 0.1); color: var(--mint); }
+    @keyframes stepPulse { 50% { transform: scale(1.14); } }
+
+    .scan-track {
+      height: 2px;
+      margin-top: 20px;
+      border-radius: 99px;
+      background: rgba(148, 177, 220, 0.1);
+      overflow: hidden;
+    }
+    .scan-track span {
+      display: block;
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--mint), var(--cyan));
+      box-shadow: 0 0 12px var(--cyan);
+      transition: width 0.4s linear;
+    }
+
+    @keyframes panelIn {
+      from { opacity: 0; transform: translateY(26px) scale(0.985); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ---------- Results ---------- */
+    .results {
+      position: relative;
+      padding: 18px 0 80px;
+      scroll-margin-top: 90px;
+    }
+
+    .results[data-status="SAFE"] { --risk: #5ef0a7; --risk-soft: rgba(94, 240, 167, 0.14); }
+    .results[data-status="WARNING"] { --risk: #ffc857; --risk-soft: rgba(255, 200, 87, 0.14); }
+    .results[data-status="DANGER"] { --risk: #ff4d6d; --risk-soft: rgba(255, 77, 109, 0.14); }
+
+    .results-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 18px;
+    }
+
+    .section-kicker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      color: var(--mint);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+    .section-kicker .line { width: 24px; height: 1px; background: var(--mint); box-shadow: 0 0 8px var(--mint); }
+    .section-kicker.risk-kicker { color: var(--risk); }
+    .section-kicker.risk-kicker .line { background: var(--risk); box-shadow: 0 0 8px var(--risk); }
+
+    .results-title {
+      margin: 0;
+      font-size: clamp(28px, 3.1vw, 42px);
+      line-height: 1.08;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .report-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+      color: #5d6f88;
+      font-family: var(--font-mono);
+      font-size: 8.5px;
+    }
+    .report-id {
+      padding: 5px 8px;
+      border: 1px solid rgba(148, 177, 220, 0.12);
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.02);
+      color: #8494ac;
+      letter-spacing: 0.06em;
+    }
+    .report-meta .separator { width: 3px; height: 3px; background: #3f4f65; border-radius: 50%; }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: minmax(310px, 0.38fr) minmax(0, 1fr);
+      gap: 14px;
+    }
+
+    .result-card {
+      position: relative;
+      border: 1px solid rgba(148, 177, 220, 0.12);
+      border-radius: var(--radius-lg);
+      background:
+        radial-gradient(ellipse 80% 70% at 100% 0, rgba(34, 230, 255, 0.035), transparent 60%),
+        linear-gradient(155deg, rgba(16, 23, 40, 0.78), rgba(7, 11, 21, 0.82));
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      overflow: hidden;
+      transition: transform 0.22s ease-out, border-color 0.3s, box-shadow 0.3s;
+      transform-style: preserve-3d;
+    }
+    .result-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 12%; right: 12%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--risk) 44%, transparent), transparent);
+    }
+    .result-card:hover { border-color: rgba(148, 177, 220, 0.2); box-shadow: 0 34px 80px rgba(0, 0, 0, 0.34); }
+
+    .score-card { padding: 23px; text-align: center; }
+    .core-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      text-align: left;
+    }
+    .risk-label {
+      color: #71819b;
+      font-family: var(--font-mono);
+      font-size: 8px;
+      font-weight: 600;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 28px;
+      padding: 4px 10px;
+      border-radius: 99px;
+      border: 1px solid color-mix(in srgb, var(--risk) 42%, transparent);
+      background: color-mix(in srgb, var(--risk) 10%, transparent);
+      color: var(--risk);
+      font-family: var(--font-mono);
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      box-shadow: 0 0 24px var(--risk-soft), inset 0 0 18px color-mix(in srgb, var(--risk) 4%, transparent);
+      animation: badgePulse 2.6s ease-in-out infinite;
+    }
+    .status-badge .badge-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--risk);
+      box-shadow: 0 0 9px var(--risk);
+    }
+    @keyframes badgePulse {
+      0%, 100% { box-shadow: 0 0 20px var(--risk-soft); }
+      50% { box-shadow: 0 0 34px color-mix(in srgb, var(--risk) 24%, transparent); }
+    }
+
+    .meter-wrap {
+      position: relative;
+      width: 246px;
+      height: 246px;
+      margin: 20px auto 9px;
+    }
+    .meter-orbit {
+      position: absolute;
+      inset: -9px;
+      border-radius: 50%;
+      border: 1px dashed color-mix(in srgb, var(--risk) 20%, transparent);
+      animation: meterRotate 22s linear infinite;
+    }
+    .meter-orbit::before {
+      content: "";
+      position: absolute;
+      top: 50%; right: -3px;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--risk);
+      box-shadow: 0 0 10px var(--risk);
+    }
+    @keyframes meterRotate { to { transform: rotate(360deg); } }
+
+    .meter-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      transform: rotate(-90deg);
+      filter: drop-shadow(0 0 12px var(--risk-soft));
+    }
+    .meter-track { fill: none; stroke: rgba(148, 177, 220, 0.11); stroke-width: 9; }
+    .meter-arc {
+      fill: none;
+      stroke: var(--risk);
+      stroke-width: 9;
+      stroke-linecap: round;
+      stroke-dasharray: 603.19;
+      stroke-dashoffset: 603.19;
+      filter: drop-shadow(0 0 8px var(--risk));
+      transition: stroke 0.5s;
+    }
+    .meter-inner-glow {
+      position: absolute;
+      inset: 34px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 38%, var(--risk-soft), transparent 64%);
+      border: 1px solid rgba(148, 177, 220, 0.06);
+      box-shadow: inset 0 0 36px rgba(0, 0, 0, 0.32);
+    }
+
+    .meter-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding-top: 6px;
+    }
+    .score-number {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 1px;
+      font-family: var(--font-mono);
+      font-size: 64px;
+      line-height: 1;
+      letter-spacing: -0.08em;
+      font-weight: 700;
+      color: #f6faff;
+      text-shadow: 0 0 34px var(--risk-soft);
+      font-variant-numeric: tabular-nums;
+    }
+    .score-denom {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #60738d;
+      letter-spacing: -0.03em;
+    }
+    .score-caption {
+      margin-top: 9px;
+      color: #63748d;
+      font-family: var(--font-mono);
+      font-size: 7.5px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .score-headline {
+      margin: 7px 0 5px;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.24;
+      letter-spacing: -0.03em;
+    }
+    .score-summary {
+      min-height: 48px;
+      margin: 0 auto;
+      max-width: 290px;
+      color: #7f8da6;
+      font-size: 10.5px;
+      line-height: 1.55;
+    }
+
+    .score-chips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 5px;
+      margin-top: 14px;
+    }
+    .score-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 22px;
+      padding: 3px 7px;
+      border: 1px solid rgba(148, 177, 220, 0.11);
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.018);
+      color: #75859e;
+      font-family: var(--font-mono);
+      font-size: 7.5px;
+      letter-spacing: 0.03em;
+    }
+    .score-chip strong { color: #aab9cf; font-weight: 600; }
+
+    .guidance-card {
+      padding: 25px clamp(22px, 3vw, 32px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .guidance-card::after {
+      content: "";
+      position: absolute;
+      right: -34px; bottom: -48px;
+      width: 240px; height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--risk-soft), transparent 68%);
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .guidance-head {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .guidance-kicker {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--risk);
+      font-family: var(--font-mono);
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+    }
+    .guidance-kicker svg { width: 14px; height: 14px; }
+    .confidence {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+      color: #6f8099;
+      font-size: 9px;
+    }
+    .confidence strong { color: #c4d3e7; font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+
+    .guidance-title {
+      position: relative;
+      max-width: 560px;
+      margin-bottom: 10px;
+      font-size: clamp(23px, 2.5vw, 32px);
+      line-height: 1.15;
+      letter-spacing: -0.045em;
+      font-weight: 800;
+    }
+    .guidance-title .risk-text { color: var(--risk); }
+    .recommendation-text {
+      position: relative;
+      max-width: 650px;
+      margin: 0 0 18px;
+      color: #96a6bf;
+      font-size: 12.5px;
+      line-height: 1.68;
+    }
+
+    .action-list {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin: 0 0 20px;
+      padding: 0;
+      list-style: none;
+    }
+    .action-item {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      min-height: 78px;
+      padding: 11px 10px;
+      border: 1px solid rgba(148, 177, 220, 0.09);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .action-num {
+      width: 19px; height: 19px;
+      flex: 0 0 19px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      background: var(--risk-soft);
+      border: 1px solid color-mix(in srgb, var(--risk) 24%, transparent);
+      color: var(--risk);
+      font-family: var(--font-mono);
+      font-size: 8px;
+      font-weight: 700;
+    }
+    .action-text {
+      color: #8d9db5;
+      font-size: 9.5px;
+      line-height: 1.5;
+    }
+
+    .result-actions {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: auto;
+      flex-wrap: wrap;
+    }
+    .copy-btn, .new-scan-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      height: 39px;
+      padding: 0 14px;
+      border-radius: 9px;
+      font-size: 10.5px;
+      font-weight: 700;
+      transition: all 0.22s;
+    }
+    .copy-btn {
+      color: #dff8ff;
+      border: 1px solid rgba(34, 230, 255, 0.25);
+      background: rgba(34, 230, 255, 0.075);
+    }
+    .copy-btn:hover { background: rgba(34, 230, 255, 0.12); border-color: rgba(34, 230, 255, 0.4); }
+    .copy-btn.copied { color: #bfffe0; border-color: rgba(94, 240, 167, 0.42); background: rgba(94, 240, 167, 0.09); }
+    .copy-btn svg, .new-scan-btn svg { width: 13px; height: 13px; }
+    .new-scan-btn {
+      color: #8b9bb4;
+      border: 1px solid rgba(148, 177, 220, 0.13);
+      background: rgba(255, 255, 255, 0.025);
+    }
+    .new-scan-btn:hover { color: #e7f0ff; border-color: rgba(148, 177, 220, 0.26); background: rgba(255, 255, 255, 0.04); }
+
+    .insight-grid {
+      display: grid;
+      grid-template-columns: minmax(285px, 0.36fr) minmax(0, 1fr);
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .breakdown-card { padding: 22px; }
+    .card-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 19px;
+    }
+    .card-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    .card-sub {
+      margin: 3px 0 0;
+      color: #63738c;
+      font-size: 9px;
+    }
+    .mini-badge {
+      padding: 4px 7px;
+      border: 1px solid rgba(148, 177, 220, 0.11);
+      border-radius: 5px;
+      color: #6f829c;
+      font-family: var(--font-mono);
+      font-size: 7.5px;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+
+    .breakdown-list { display: grid; gap: 13px; }
+    .breakdown-row { display: grid; gap: 5px; }
+    .breakdown-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .breakdown-label { color: #96a6bd; font-size: 9.5px; font-weight: 600; }
+    .breakdown-points { color: var(--risk); font-family: var(--font-mono); font-size: 8px; font-weight: 600; }
+    .bar-track {
+      height: 4px;
+      border-radius: 99px;
+      background: rgba(148, 177, 220, 0.085);
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, color-mix(in srgb, var(--risk) 65%, #fff), var(--risk));
+      box-shadow: 0 0 12px var(--risk-soft);
+      transition: width 1s var(--ease);
+    }
+
+    .breakdown-foot {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 19px;
+      padding-top: 13px;
+      border-top: 1px solid rgba(148, 177, 220, 0.08);
+      color: #53657e;
+      font-size: 8.5px;
+      line-height: 1.45;
+    }
+    .breakdown-foot svg { width: 12px; height: 12px; flex: 0 0 12px; }
+
+    .signals-card { padding: 22px; }
+    .signals-scroll {
+      max-height: 470px;
+      overflow-y: auto;
+      padding-right: 5px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(148, 177, 220, 0.18) transparent;
+    }
+    .signals-scroll::-webkit-scrollbar { width: 5px; }
+    .signals-scroll::-webkit-scrollbar-thumb { background: rgba(148, 177, 220, 0.18); border-radius: 9px; }
+
+    .signal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .signal-item {
+      position: relative;
+      min-height: 106px;
+      padding: 13px;
+      border: 1px solid rgba(148, 177, 220, 0.095);
+      border-radius: 11px;
+      background: rgba(255, 255, 255, 0.018);
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(8px);
+      animation: signalIn 0.5s var(--ease) forwards;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .signal-item:hover { border-color: rgba(148, 177, 220, 0.18); background: rgba(255, 255, 255, 0.028); }
+    .signal-item::before {
+      content: "";
+      position: absolute;
+      top: 12px; bottom: 12px; left: 0;
+      width: 2px;
+      border-radius: 2px;
+      background: var(--sev-color);
+      box-shadow: 0 0 12px var(--sev-color);
+      opacity: 0.8;
+    }
+    .signal-item[data-severity="HIGH"] { --sev-color: #ff5e7b; }
+    .signal-item[data-severity="MEDIUM"] { --sev-color: #ffc857; }
+    .signal-item[data-severity="LOW"] { --sev-color: #7dcfff; }
+    @keyframes signalIn { to { opacity: 1; transform: translateY(0); } }
+
+    .signal-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 7px;
+      margin-bottom: 7px;
+    }
+    .signal-severity {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 6px;
+      border-radius: 4px;
+      border: 1px solid color-mix(in srgb, var(--sev-color) 25%, transparent);
+      background: color-mix(in srgb, var(--sev-color) 7%, transparent);
+      color: var(--sev-color);
+      font-family: var(--font-mono);
+      font-size: 6.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+    .signal-severity .sev-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--sev-color); box-shadow: 0 0 6px var(--sev-color); }
+    .signal-points {
+      color: #52647c;
+      font-family: var(--font-mono);
+      font-size: 7px;
+    }
+    .signal-title {
+      margin: 0 0 5px;
+      color: #d2ddeb;
+      font-size: 11.5px;
+      font-weight: 700;
+      line-height: 1.34;
+      letter-spacing: -0.01em;
+    }
+    .signal-desc {
+      margin: 0;
+      color: #71829a;
+      font-size: 9px;
+      line-height: 1.52;
+    }
+
+    .safe-empty {
+      display: grid;
+      place-items: center;
+      min-height: 270px;
+      padding: 30px;
+      text-align: center;
+    }
+    .safe-orb {
+      position: relative;
+      width: 74px; height: 74px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 18px;
+      border-radius: 50%;
+      border: 1px solid rgba(94, 240, 167, 0.24);
+      background: radial-gradient(circle, rgba(94, 240, 167, 0.16), transparent 68%);
+      color: var(--mint);
+      box-shadow: 0 0 38px rgba(94, 240, 167, 0.1);
+    }
+    .safe-orb::before {
+      content: "";
+      position: absolute;
+      inset: -7px;
+      border-radius: 50%;
+      border: 1px dashed rgba(94, 240, 167, 0.13);
+      animation: meterRotate 20s linear infinite reverse;
+    }
+    .safe-orb svg { width: 30px; height: 30px; filter: drop-shadow(0 0 10px rgba(94, 240, 167, 0.4)); }
+    .safe-empty h4 { margin: 0 0 6px; font-size: 18px; letter-spacing: -0.03em; }
+    .safe-empty p { max-width: 390px; margin: 0; color: #6f8097; font-size: 10.5px; line-height: 1.6; }
+
+    .safe-checks {
+      margin-top: 14px;
+      padding: 17px 20px;
+      border: 1px solid rgba(94, 240, 167, 0.12);
+      border-radius: 13px;
+      background: rgba(94, 240, 167, 0.032);
+    }
+    .safe-checks-head {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 9px;
+      color: #7ee7b7;
+      font-family: var(--font-mono);
+      font-size: 8px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .safe-checks-head svg { width: 12px; height: 12px; }
+    .safe-checks-list { display: flex; flex-wrap: wrap; gap: 7px; margin: 0; padding: 0; list-style: none; }
+    .safe-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 8px;
+      border: 1px solid rgba(94, 240, 167, 0.1);
+      border-radius: 6px;
+      background: rgba(94, 240, 167, 0.035);
+      color: #8ca99f;
+      font-size: 8.5px;
+    }
+    .safe-check svg { width: 10px; height: 10px; color: var(--mint); }
+
+    /* ---------- Supporting sections ---------- */
+    .how-section {
+      position: relative;
+      padding: 88px 0 82px;
+      border-top: 1px solid rgba(148, 177, 220, 0.075);
+    }
+    .how-section::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 18%; right: 18%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(34, 230, 255, 0.23), transparent);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 34px;
+      margin-bottom: 30px;
+    }
+    .section-title {
+      max-width: 630px;
+      margin: 0;
+      font-size: clamp(32px, 3.8vw, 48px);
+      line-height: 1.08;
+      letter-spacing: -0.052em;
+      font-weight: 800;
+    }
+    .section-copy {
+      max-width: 350px;
+      margin: 0 0 5px;
+      color: #73839c;
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .how-card {
+      position: relative;
+      min-height: 270px;
+      padding: 23px;
+      border: 1px solid rgba(148, 177, 220, 0.11);
+      border-radius: var(--radius-lg);
+      background:
+        radial-gradient(ellipse 80% 70% at 100% 0, rgba(34, 230, 255, 0.025), transparent 60%),
+        linear-gradient(150deg, rgba(15, 22, 38, 0.67), rgba(7, 11, 21, 0.6));
+      overflow: hidden;
+      transition: transform 0.24s ease-out, border-color 0.3s, background 0.3s;
+      transform-style: preserve-3d;
+    }
+    .how-card:hover { border-color: rgba(148, 177, 220, 0.2); }
+    .how-card::after {
+      content: attr(data-index);
+      position: absolute;
+      top: 17px; right: 18px;
+      color: rgba(119, 142, 174, 0.32);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+    }
+    .how-icon {
+      width: 45px; height: 45px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 29px;
+      border: 1px solid rgba(34, 230, 255, 0.16);
+      border-radius: 12px;
+      color: var(--cyan);
+      background: rgba(34, 230, 255, 0.05);
+      box-shadow: 0 0 26px rgba(34, 230, 255, 0.055);
+    }
+    .how-icon.violet { color: #b6a1ff; border-color: rgba(159, 124, 255, 0.18); background: rgba(159, 124, 255, 0.055); }
+    .how-icon.mint { color: var(--mint); border-color: rgba(94, 240, 167, 0.18); background: rgba(94, 240, 167, 0.05); }
+    .how-icon svg { width: 21px; height: 21px; }
+    .how-title { margin-bottom: 8px; font-size: 18px; font-weight: 800; letter-spacing: -0.035em; }
+    .how-text { margin: 0; color: #75859f; font-size: 10.5px; line-height: 1.65; }
+    .how-tags {
+      position: absolute;
+      bottom: 18px; left: 23px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .how-tag {
+      padding: 3px 6px;
+      border: 1px solid rgba(148, 177, 220, 0.09);
+      border-radius: 4px;
+      color: #556880;
+      font-family: var(--font-mono);
+      font-size: 6.5px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .coverage {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 0.44fr) minmax(0, 1fr);
+      gap: clamp(30px, 5vw, 78px);
+      align-items: center;
+      padding: 41px 0 90px;
+    }
+    .coverage-title {
+      margin: 0 0 14px;
+      font-size: clamp(30px, 3.5vw, 44px);
+      line-height: 1.08;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+    .coverage-copy {
+      max-width: 400px;
+      margin: 0 0 20px;
+      color: #77869f;
+      font-size: 11.5px;
+      line-height: 1.7;
+    }
+    .coverage-note {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: #5f7690;
+      font-family: var(--font-mono);
+      font-size: 8.5px;
+      letter-spacing: 0.04em;
+    }
+    .coverage-note svg { width: 14px; height: 14px; color: var(--mint); }
+
+    .coverage-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .coverage-item {
+      min-height: 118px;
+      padding: 16px;
+      border: 1px solid rgba(148, 177, 220, 0.1);
+      border-radius: 13px;
+      background: linear-gradient(150deg, rgba(15, 22, 38, 0.55), rgba(7, 11, 21, 0.42));
+      transition: border-color 0.25s, background 0.25s, transform 0.25s var(--ease);
+    }
+    .coverage-item:hover {
+      transform: translateY(-2px);
+      border-color: rgba(159, 124, 255, 0.2);
+      background: rgba(159, 124, 255, 0.035);
+    }
+    .coverage-icon { width: 17px; height: 17px; color: #8e9fb8; margin-bottom: 14px; }
+    .coverage-name { margin: 0 0 5px; color: #bac7da; font-size: 11px; font-weight: 700; letter-spacing: -0.01em; }
+    .coverage-detail { margin: 0; color: #5c6e88; font-size: 8.5px; line-height: 1.5; }
+    .coverage-code {
+      display: inline-block;
+      margin-top: 11px;
+      color: #5b7e79;
+      font-family: var(--font-mono);
+      font-size: 6.5px;
+      letter-spacing: 0.08em;
+    }
+
+    .final-cta {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+      margin-bottom: 70px;
+      padding: 31px 34px;
+      border: 1px solid rgba(34, 230, 255, 0.16);
+      border-radius: 20px;
+      background:
+        radial-gradient(ellipse 42% 100% at 100% 50%, rgba(159, 124, 255, 0.1), transparent 70%),
+        linear-gradient(120deg, rgba(34, 230, 255, 0.055), rgba(15, 22, 38, 0.62));
+      overflow: hidden;
+    }
+    .final-cta::before {
+      content: "";
+      position: absolute;
+      left: 34px; right: 34px; top: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(34, 230, 255, 0.32), transparent);
+    }
+    .final-cta-copy h3 { margin: 0 0 5px; font-size: 24px; letter-spacing: -0.04em; }
+    .final-cta-copy p { margin: 0; color: #7486a1; font-size: 11px; }
+    .final-cta .primary-link { flex-shrink: 0; }
+
+    .site-footer {
+      position: relative;
+      border-top: 1px solid rgba(148, 177, 220, 0.08);
+      padding: 28px 0 34px;
+    }
+    .footer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: #76869f;
+      font-size: 10px;
+    }
+    .footer-brand .brand-mark { width: 28px; height: 28px; border-radius: 8px; }
+    .footer-brand .brand-mark svg { width: 17px; height: 17px; }
+    .footer-brand strong { color: #b4c1d3; font-size: 11px; }
+    .footer-tech { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+    .tech-pill {
+      padding: 4px 7px;
+      border: 1px solid rgba(148, 177, 220, 0.1);
+      border-radius: 5px;
+      color: #586b84;
+      font-family: var(--font-mono);
+      font-size: 7px;
+      letter-spacing: 0.06em;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 25px;
+      z-index: 80;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 43px;
+      max-width: min(420px, calc(100% - 32px));
+      padding: 9px 14px;
+      border: 1px solid rgba(94, 240, 167, 0.25);
+      border-radius: 10px;
+      background: rgba(9, 18, 24, 0.92);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 30px rgba(94, 240, 167, 0.07);
+      color: #c7f7e3;
+      font-size: 10.5px;
+      font-weight: 600;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      opacity: 0;
+      transform: translate(-50%, 16px);
+      pointer-events: none;
+      transition: opacity 0.25s, transform 0.25s var(--ease);
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .toast svg { width: 14px; height: 14px; color: var(--mint); }
+    .toast.error { color: #ffd4db; border-color: rgba(255, 77, 109, 0.28); }
+    .toast.error svg { color: var(--red); }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 1120px) {
+      .hero { grid-template-columns: minmax(0, 0.8fr) minmax(480px, 1.2fr); gap: 36px; }
+      .hero-title { font-size: clamp(45px, 5.7vw, 65px); }
+      .action-list { grid-template-columns: 1fr; }
+      .action-item { min-height: 54px; }
+    }
+
+    @media (max-width: 980px) {
+      .nav-links { display: none; }
+      .hero { grid-template-columns: 1fr; gap: 36px; padding-top: 52px; }
+      .hero-copy { max-width: 700px; padding-top: 0; }
+      .hero-title { max-width: 620px; }
+      .trust-row { max-width: 610px; }
+      .analyzer-shell { max-width: 740px; }
+      .result-grid, .insight-grid { grid-template-columns: 1fr; }
+      .score-card { display: grid; grid-template-columns: 1fr 1fr; align-items: center; text-align: left; column-gap: 20px; }
+      .score-card .core-card-top { grid-column: 1 / -1; }
+      .meter-wrap { margin-inline: 0; }
+      .score-headline, .score-summary, .score-chips { text-align: left; }
+      .score-summary { margin-left: 0; max-width: 100%; }
+      .score-chips { justify-content: flex-start; }
+      .signals-scroll { max-height: none; }
+      .coverage { grid-template-columns: 1fr; gap: 26px; }
+      .coverage-copy { max-width: 600px; }
+      .coverage-grid { max-width: 760px; }
+    }
+
+    @media (max-width: 800px) {
+      .how-grid { grid-template-columns: 1fr; }
+      .how-card { min-height: 215px; }
+      .how-tags { position: static; margin-top: 18px; }
+      .how-icon { margin-bottom: 20px; }
+      .section-head { display: block; }
+      .section-copy { margin-top: 12px; }
+      .score-card { display: block; text-align: center; }
+      .meter-wrap { margin-inline: auto; }
+      .score-headline, .score-summary, .score-chips { text-align: center; }
+      .score-summary { margin-inline: auto; }
+      .score-chips { justify-content: center; }
+      .coverage-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 720px) {
+      .page-width { width: min(var(--max), calc(100% - 28px)); }
+      .site-header .nav { min-height: 66px; }
+      .engine-pill { display: none; }
+      .nav-cta { padding: 0 12px; }
+      .nav-cta span { display: none; }
+      .hero { padding-top: 34px; padding-bottom: 38px; }
+      .hero-title { font-size: clamp(41px, 10.5vw, 58px); margin-top: 20px; }
+      .hero-sub { font-size: 14px; }
+      .trust-row { gap: 7px; }
+      .trust-stat { padding: 10px; min-height: 72px; }
+      .trust-value { font-size: 16px; }
+      .trust-label { font-size: 8.5px; }
+      .signal-tags { display: none; }
+      .panel-head { margin-bottom: 20px; }
+      .analyzer-inner { padding: 19px; border-radius: calc(var(--radius-xl) - 1px); }
+      .analyzer-panel { border-radius: 22px; }
+      .scan-overlay { border-radius: 21px; }
+      .analyzer-title { font-size: 25px; }
+      .samples-grid { grid-template-columns: 1fr 1fr; }
+      .sample-name { font-size: 9.5px; }
+      .input-bottom .key-hint { display: none; }
+      .results-head { display: block; }
+      .report-meta { justify-content: flex-start; margin-top: 12px; }
+      .result-card { border-radius: 16px; }
+      .signal-grid { grid-template-columns: 1fr; }
+      .final-cta { display: block; padding: 26px; }
+      .final-cta .primary-link { margin-top: 18px; }
+      .footer-row { display: block; }
+      .footer-tech { justify-content: flex-start; margin-top: 15px; }
+    }
+
+    @media (max-width: 520px) {
+      .nav { gap: 12px; }
+      .brand-name { font-size: 16px; }
+      .brand-mark { width: 34px; height: 34px; border-radius: 10px; }
+      .nav-cta { display: none; }
+      .hero-actions .primary-link, .hero-actions .quiet-link { flex: 1; padding-inline: 10px; }
+      .hero-foot { align-items: flex-start; flex-wrap: wrap; line-height: 1.5; }
+      .samples-grid { grid-template-columns: 1fr; }
+      .sample-card { min-height: 52px; }
+      .type-btn { gap: 5px; font-size: 9.5px; }
+      .type-btn svg { width: 12px; height: 12px; }
+      .panel-foot { display: none; }
+      .score-card, .guidance-card, .breakdown-card, .signals-card { padding: 19px; }
+      .meter-wrap { width: 218px; height: 218px; }
+      .score-number { font-size: 55px; }
+      .guidance-title { font-size: 23px; }
+      .recommendation-text { font-size: 11.5px; }
+      .result-actions { display: grid; grid-template-columns: 1fr 1fr; }
+      .coverage-grid { grid-template-columns: 1fr 1fr; }
+      .coverage-item { min-height: 104px; }
+      .how-section { padding: 58px 0 54px; }
+      .coverage { padding-bottom: 58px; }
+      .final-cta { margin-bottom: 45px; }
+      .toast { bottom: 14px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    :focus-visible {
+      outline: 2px solid rgba(34, 230, 255, 0.72);
+      outline-offset: 3px;
+    }
+
+    .result-card {
+      animation: cardIn 0.65s var(--ease) both;
+    }
+    .result-card:nth-child(2) { animation-delay: 0.07s; }
+    .insight-grid .result-card:nth-child(1) { animation-delay: 0.13s; }
+    .insight-grid .result-card:nth-child(2) { animation-delay: 0.19s; }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(14px) scale(0.994); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .results.is-refreshing .result-card { animation: none; }
+
+    @media print {
+      body::before, body::after, #network, .site-header, .analyzer-shell,
+      .hero-copy, .how-section, .coverage, .final-cta, .site-footer, .toast { display: none !important; }
+      .results { display: block !important; padding: 0; }
+      body { background: #fff; color: #111; }
+      .result-card { background: #fff; border-color: #ccc; box-shadow: none; }
+      .score-summary, .recommendation-text, .signal-desc, .score-headline, .card-title { color: #222; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#analyzer">Skip to analyzer</a>
+  <canvas id="network" aria-hidden="true"></canvas>
+
+  <header class="site-header">
+    <nav class="nav page-width" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="ScamShield AI home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none">
+            <defs>
+              <linearGradient id="markGrad" x1="4" y1="3" x2="28" y2="29" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#5ef0a7"/><stop offset="1" stop-color="#22e6ff"/>
+              </linearGradient>
+            </defs>
+            <path d="M16 2.8 26.8 7v8.5c0 7.2-4.4 12.9-10.8 15.7C9.6 28.4 5.2 22.7 5.2 15.5V7L16 2.8Z" fill="url(#markGrad)" opacity="0.17" stroke="url(#markGrad)" stroke-width="1.2"/>
+            <path d="m11.4 15.9 3.1 3.1 6.4-6.7" stroke="url(#markGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 2.8v3.4" stroke="#5ef0a7" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+          </svg>
+        </span>
+        <span class="brand-name">ScamShield<em>AI</em></span>
+      </a>
+
+      <div class="nav-links">
+        <a class="nav-link" href="#analyzer">Analyzer</a>
+        <a class="nav-link" href="#how">How it works</a>
+        <a class="nav-link" href="#coverage">Coverage</a>
+      </div>
+
+      <div class="nav-right">
+        <div class="engine-pill"><span class="engine-dot"></span> ENGINE ONLINE</div>
+        <a class="nav-cta" href="#analyzer">
+          <span>Run a scan</span>
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h9M8.5 3.5 13 8l-4.5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero page-width" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <div class="hero-orbit" aria-hidden="true"></div>
+        <div class="eyebrow">
+          <span class="eyebrow-badge">2026</span>
+          AIgnite Buildathon · Consumer safety
+        </div>
+
+        <h1 class="hero-title" id="hero-title">
+          <span class="dim">Stop the scam.</span><br />
+          <span class="grad">Before the click.</span>
+        </h1>
+
+        <p class="hero-sub">
+          Paste a suspicious product listing, review, checkout link or message.
+          <strong>ScamShield AI</strong> decodes the deception in under a second — and tells you
+          exactly what to do next.
+        </p>
+
+        <div class="hero-actions">
+          <a class="primary-link" href="#analyzer">
+            Inspect a scam
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h9M8.5 3.5 13 8l-4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="quiet-link" href="#how">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M8 7.2v3.2M8 5.3v.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            How it works
+          </a>
+        </div>
+
+        <div class="trust-row" aria-label="Product facts">
+          <div class="trust-stat">
+            <span class="trust-value">40<span>+</span></span>
+            <span class="trust-label">explainable deception signals</span>
+          </div>
+          <div class="trust-stat">
+            <span class="trust-value">&lt;1<span>s</span></span>
+            <span class="trust-label">from paste to clear verdict</span>
+          </div>
+          <div class="trust-stat">
+            <span class="trust-value">0<span> B</span></span>
+            <span class="trust-label">input stored or sent away</span>
+          </div>
+        </div>
+
+        <div class="hero-foot">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.8 13.4 4v4.2c0 3.6-2.2 6.4-5.4 7.8-3.2-1.4-5.4-4.2-5.4-7.8V4L8 1.8Z" stroke="currentColor" stroke-width="1.15"/><path d="m5.7 7.9 1.5 1.5 3.2-3.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Local-first analysis</span><span class="dot"></span>
+          <span>No account required</span><span class="dot"></span>
+          <span>Explainable by design</span>
+        </div>
+
+        <div class="signal-tags" aria-label="Covered scam categories">
+          <span class="signal-tag">OTP theft</span>
+          <span class="signal-tag">Lookalike domains</span>
+          <span class="signal-tag">Fake reviews</span>
+          <span class="signal-tag">Courier scams</span>
+          <span class="signal-tag">Gift-card fraud</span>
+        </div>
+      </div>
+
+      <div class="analyzer-shell" id="analyzer">
+        <div class="analyzer-panel">
+          <div class="analyzer-inner">
+            <div class="panel-head">
+              <div class="panel-kicker"><span class="live-dot"></span> LIVE THREAT ANALYZER</div>
+              <span class="local-chip">
+                <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><rect x="2.4" y="5.2" width="7.2" height="5.2" rx="1" stroke="currentColor" stroke-width="1"/><path d="M4 5V3.8a2 2 0 0 1 4 0V5" stroke="currentColor" stroke-width="1"/></svg>
+                LOCAL PROCESSING
+              </span>
+            </div>
+
+            <h2 class="analyzer-title">What should we <span class="thin">inspect?</span></h2>
+            <p class="analyzer-lede">One paste. A threat index, the evidence behind it, and your next safe move.</p>
+
+            <form id="scanForm" novalidate>
+              <div class="type-switch" role="tablist" aria-label="Content type">
+                <button class="type-btn" type="button" role="tab" data-type="url" aria-selected="false">
+                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6.6 9.4a2.7 2.7 0 0 0 3.8 0l2-2a2.7 2.7 0 0 0-3.8-3.8l-1 1" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/><path d="M9.4 6.6a2.7 2.7 0 0 0-3.8 0l-2 2a2.7 2.7 0 0 0 3.8 3.8l1-1" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+                  Link / URL
+                </button>
+                <button class="type-btn" type="button" role="tab" data-type="review" aria-selected="false">
+                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m8 1.9 1.9 3.8 4.2.6-3 3 .7 4.2L8 11.5l-3.8 2 .7-4.2-3-3 4.2-.6L8 1.9Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+                  Review
+                </button>
+                <button class="type-btn" type="button" role="tab" data-type="message" aria-selected="true">
+                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13.7 7.2c0 3-2.5 5.4-5.7 5.4-.7 0-1.3-.1-1.9-.3l-2.7 1 .7-2.2a5 5 0 0 1-1.8-3.9C2.3 4.2 4.8 1.8 8 1.8s5.7 2.4 5.7 5.4Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M5.6 7.4h.1M8 7.4h.1M10.4 7.4h.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                  Message
+                </button>
+              </div>
+
+              <div class="input-shell" id="inputShell">
+                <div class="input-top">
+                  <label class="input-label" for="contentInput" id="inputLabel">Suspicious message</label>
+                  <div class="input-tools">
+                    <button class="text-tool" type="button" id="pasteBtn" title="Paste from clipboard">
+                      <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><rect x="2.3" y="1.6" width="7.4" height="8.9" rx="1.2" stroke="currentColor" stroke-width="1"/><path d="M4.2 1.6V2.8h3.6V1.6M4.2 5.1h3.6M4.2 7.2h2.4" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
+                      Paste
+                    </button>
+                    <button class="text-tool" type="button" id="clearBtn" hidden>
+                      <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="m3 3 6 6M9 3 3 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                      Clear
+                    </button>
+                  </div>
+                </div>
+                <textarea id="contentInput" name="content" maxlength="6000" spellcheck="false" autocomplete="off" aria-describedby="inputError charCount" placeholder="Paste the SMS, WhatsApp message or email that feels off…"></textarea>
+                <div class="input-bottom">
+                  <span class="char-count" id="charCount">0 / 6,000</span>
+                  <span class="key-hint"><kbd>Ctrl</kbd><span>+</span><kbd>Enter</kbd> to scan</span>
+                </div>
+              </div>
+              <p class="input-error" id="inputError" role="alert"></p>
+
+              <div class="samples-head">
+                <span class="samples-label">Try a live example</span>
+                <span class="auto-label">auto-runs</span>
+              </div>
+
+              <div class="samples-grid" aria-label="Example inputs">
+                <button class="sample-card" type="button" data-sample="deal" aria-label="Run the Suspicious 90% Off Deal example">
+                  <span class="sample-icon danger">
+                    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.2 6.3V3.5c0-.7.6-1.3 1.3-1.3h2.8l7.2 7.2a1.2 1.2 0 0 1 0 1.7l-3.1 3.1a1.2 1.2 0 0 1-1.7 0L2.2 6.3Z" stroke="currentColor" stroke-width="1.15"/><circle cx="5.2" cy="5.2" r=".9" fill="currentColor"/></svg>
+                  </span>
+                  <span class="sample-copy">
+                    <span class="sample-name">Suspicious 90% Off Deal</span>
+                    <span class="sample-type">Message · likely fraud</span>
+                  </span>
+                  <span class="sample-arrow"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.2 8.8 8.8 3.2M4.5 3.2h4.3v4.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+
+                <button class="sample-card" type="button" data-sample="phish" aria-label="Run the Phishing SMS Link example">
+                  <span class="sample-icon danger">
+                    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="4.1" y="1.5" width="7.8" height="13" rx="1.7" stroke="currentColor" stroke-width="1.15"/><path d="M7 12.7h2M8 4.4v4M8 10.4v.1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                  </span>
+                  <span class="sample-copy">
+                    <span class="sample-name">Phishing SMS Link</span>
+                    <span class="sample-type">Message · credential theft</span>
+                  </span>
+                  <span class="sample-arrow"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.2 8.8 8.8 3.2M4.5 3.2h4.3v4.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+
+                <button class="sample-card" type="button" data-sample="clean" aria-label="Run the Clean Official Store example">
+                  <span class="sample-icon safe">
+                    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 5.5h11l-.9 8.1a1.1 1.1 0 0 1-1.1 1H4.5a1.1 1.1 0 0 1-1.1-1l-.9-8.1Z" stroke="currentColor" stroke-width="1.1"/><path d="M5.5 5.5V4a2.5 2.5 0 0 1 5 0v1.5M6.2 9.1l1.2 1.2 2.5-2.5" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                  <span class="sample-copy">
+                    <span class="sample-name">Clean Official Store</span>
+                    <span class="sample-type">URL · verified domain</span>
+                  </span>
+                  <span class="sample-arrow"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.2 8.8 8.8 3.2M4.5 3.2h4.3v4.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+
+                <button class="sample-card" type="button" data-sample="review" aria-label="Run the Fake Review Farm example">
+                  <span class="sample-icon warning">
+                    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m8 1.9 1.9 3.8 4.2.6-3 3 .7 4.2L8 11.5l-3.8 2 .7-4.2-3-3 4.2-.6L8 1.9Z" stroke="currentColor" stroke-width="1.15" stroke-linejoin="round"/></svg>
+                  </span>
+                  <span class="sample-copy">
+                    <span class="sample-name">Fake Review Farm</span>
+                    <span class="sample-type">Review · incentivised</span>
+                  </span>
+                  <span class="sample-arrow"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.2 8.8 8.8 3.2M4.5 3.2h4.3v4.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+              </div>
+
+              <button class="scan-btn" id="scanBtn" type="submit">
+                <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="5.6" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.6v3.7l2.3 1.4M12.2 12.2l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Run threat scan
+              </button>
+            </form>
+
+            <div class="panel-foot">
+              <span>
+                <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1.4 10 2.9v3.2c0 2.7-1.6 4.8-4 5.8-2.4-1-4-3.1-4-5.8V2.9L6 1.4Z" stroke="currentColor" stroke-width=".9"/></svg>
+                40+ weighted heuristics
+              </span>
+              <span class="secure">
+                <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><rect x="2.4" y="5.2" width="7.2" height="5.2" rx="1" stroke="currentColor" stroke-width=".9"/><path d="M4 5V3.8a2 2 0 0 1 4 0V5" stroke="currentColor" stroke-width=".9"/></svg>
+                Nothing saved
+              </span>
+            </div>
+
+            <div class="scan-overlay" id="scanOverlay" aria-live="polite" aria-busy="true">
+              <div class="scan-overlay-box">
+                <div class="radar" aria-hidden="true"></div>
+                <h3 class="scan-title">Scanning for deception</h3>
+                <p class="scan-sub" id="scanSub">Running explainable heuristics</p>
+                <ol class="scan-steps">
+                  <li class="scan-step active" data-step="0">
+                    <span class="step-marker"><svg viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="m2 5 2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                    Extracting entities, links and language cues
+                  </li>
+                  <li class="scan-step" data-step="1">
+                    <span class="step-marker"><svg viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="m2 5 2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                    Checking domain reputation and brand mismatch
+                  </li>
+                  <li class="scan-step" data-step="2">
+                    <span class="step-marker"><svg viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="m2 5 2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                    Fusing weighted signals into a risk verdict
+                  </li>
+                </ol>
+                <div class="scan-track"><span id="scanProgress"></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="results page-width" id="results" aria-labelledby="resultsTitle" hidden>
+      <div class="results-head">
+        <div>
+          <div class="section-kicker"><span class="line"></span> Analysis complete</div>
+          <h2 class="results-title" id="resultsTitle">Threat intelligence report</h2>
+        </div>
+        <div class="report-meta" aria-label="Report metadata">
+          <span class="report-id" id="reportId">SS-00000000</span>
+          <span class="separator"></span>
+          <span id="reportTime">Just now</span>
+          <span class="separator"></span>
+          <span id="reportEngine">H-ENGINE v1.0</span>
+        </div>
+      </div>
+
+      <div class="result-grid">
+        <article class="result-card score-card tilt" aria-label="Threat score">
+          <div class="core-card-top">
+            <span class="risk-label">Threat index</span>
+            <span class="status-badge" id="statusBadge">
+              <span class="badge-dot"></span>
+              <span id="statusText">DANGER</span>
+            </span>
+          </div>
+
+          <div class="meter-wrap">
+            <div class="meter-orbit" aria-hidden="true"></div>
+            <svg class="meter-svg" viewBox="0 0 240 240" aria-hidden="true">
+              <circle class="meter-track" cx="120" cy="120" r="96"></circle>
+              <circle class="meter-arc" id="meterArc" cx="120" cy="120" r="96"></circle>
+            </svg>
+            <div class="meter-inner-glow" aria-hidden="true"></div>
+            <div class="meter-center">
+              <div class="score-number"><span id="scoreNumber">0</span><span class="score-denom">/100</span></div>
+              <span class="score-caption">Risk index</span>
+            </div>
+          </div>
+
+          <h3 class="score-headline" id="scoreHeadline">Assessing the pattern…</h3>
+          <p class="score-summary" id="scoreSummary"></p>
+          <div class="score-chips" id="scoreChips"></div>
+        </article>
+
+        <article class="result-card guidance-card tilt" aria-label="Recommended action">
+          <div>
+            <div class="guidance-head">
+              <div class="guidance-kicker">
+                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.7 13.6 4v4.4c0 3.7-2.3 6.6-5.6 8.1-3.3-1.5-5.6-4.4-5.6-8.1V4L8 1.7Z" stroke="currentColor" stroke-width="1.2"/><path d="M5.5 8.2 7.2 9.9l3.5-3.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Recommended action
+              </div>
+              <span class="confidence">confidence <strong id="confidenceValue">94%</strong></span>
+            </div>
+
+            <h3 class="guidance-title" id="guidanceTitle">
+              <span id="guidanceLead">Do not engage.</span>
+              <span class="risk-text" id="guidanceRisk">Protect what matters.</span>
+            </h3>
+            <p class="recommendation-text" id="recommendationText"></p>
+
+            <ol class="action-list" id="actionList"></ol>
+          </div>
+
+          <div class="result-actions">
+            <button class="copy-btn" id="copyReportBtn" type="button">
+              <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="4.1" y="3.8" width="7.1" height="8.2" rx="1.3" stroke="currentColor" stroke-width="1.1"/><path d="M9.6 3.8V2.8a1.1 1.1 0 0 0-1.1-1.1H2.8a1.1 1.1 0 0 0-1.1 1.1v6.1a1.1 1.1 0 0 0 1.1 1.1h1.3" stroke="currentColor" stroke-width="1.1"/></svg>
+              Copy report
+            </button>
+            <button class="new-scan-btn" id="newScanBtn" type="button">
+              <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M11.9 6A4.5 4.5 0 1 0 12 8M11.8 2.5V6H8.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Scan something else
+            </button>
+          </div>
+        </article>
+      </div>
+
+      <div class="insight-grid">
+        <article class="result-card breakdown-card" aria-label="Risk composition">
+          <div class="card-heading">
+            <div>
+              <h3 class="card-title">Risk composition</h3>
+              <p class="card-sub">Weighted contribution of each signal family</p>
+            </div>
+            <span class="mini-badge" id="breakdownPoints">0 PTS</span>
+          </div>
+          <div class="breakdown-list" id="breakdownList"></div>
+          <div class="breakdown-foot">
+            <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="4.7" stroke="currentColor" stroke-width=".9"/><path d="M6 5.4v2.4M6 3.7v.1" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+            Scores are capped at 100. Multiple medium signals can compound into a high-risk verdict.
+          </div>
+        </article>
+
+        <article class="result-card signals-card" aria-label="Detected threat signals">
+          <div class="card-heading">
+            <div>
+              <h3 class="card-title">Detected signals</h3>
+              <p class="card-sub">Evidence behind the score — no black box</p>
+            </div>
+            <span class="mini-badge" id="signalsCount">0 SIGNALS</span>
+          </div>
+          <div class="signals-scroll">
+            <div class="signal-grid" id="signalGrid"></div>
+            <div class="safe-empty" id="safeEmpty" hidden>
+              <div class="safe-orb">
+                <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 2.8 26.8 7v8.5c0 7.2-4.4 12.9-10.8 15.7C9.6 28.4 5.2 22.7 5.2 15.5V7L16 2.8Z" stroke="currentColor" stroke-width="1.3"/><path d="m10.8 15.6 3.5 3.5 7-7.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <h4>No deceptive pattern found</h4>
+              <p id="safeEmptyText">This sample did not trigger a meaningful fraud combination. The checks below still matter.</p>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="safe-checks" id="safeChecksBlock" hidden>
+        <div class="safe-checks-head">
+          <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1.2 10.2 2.8v3.3c0 2.8-1.7 4.9-4.2 6-2.5-1.1-4.2-3.2-4.2-6V2.8L6 1.2Z" stroke="currentColor" stroke-width=".9"/><path d="m4.1 6 1.3 1.3 2.6-2.8" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          What checked out
+        </div>
+        <ul class="safe-checks-list" id="safeChecksList"></ul>
+      </div>
+    </section>
+    <section class="how-section" id="how">
+      <div class="page-width">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker"><span class="line"></span> Explainable by design</div>
+            <h2 class="section-title">Three layers.<br />One clear verdict.</h2>
+          </div>
+          <p class="section-copy">
+            ScamShield reasons like a cautious fraud analyst: collect the evidence,
+            weigh the combinations, then translate the risk into a safe next move.
+          </p>
+        </div>
+
+        <div class="how-grid">
+          <article class="how-card tilt" data-index="01">
+            <div class="how-icon">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="18" cy="16.5" r="3.2" stroke="currentColor" stroke-width="1.3"/><path d="m20.5 19 1.8 1.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </div>
+            <h3 class="how-title">Extract the deception</h3>
+            <p class="how-text">
+              Links, brand references, payment rails, urgency cues, credential requests and
+              review patterns are pulled apart in milliseconds — including lookalike domains
+              and hidden Unicode.
+            </p>
+            <div class="how-tags"><span class="how-tag">NLP cues</span><span class="how-tag">URL intel</span><span class="how-tag">Brand match</span></div>
+          </article>
+
+          <article class="how-card tilt" data-index="02">
+            <div class="how-icon violet">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="12" r="1.1" fill="currentColor"/></svg>
+            </div>
+            <h3 class="how-title">Fuse the risk</h3>
+            <p class="how-text">
+              Weak signals are not treated in isolation. A weighted model detects dangerous
+              combinations — urgency plus OTP request plus a hostile link, for example — and
+              caps the final index at 100.
+            </p>
+            <div class="how-tags"><span class="how-tag">Weighted score</span><span class="how-tag">Compound risk</span><span class="how-tag">0–100</span></div>
+          </article>
+
+          <article class="how-card tilt" data-index="03">
+            <div class="how-icon mint">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2.5 20 5.7v6.4c0 5.4-3.3 9.7-8 11.4-4.7-1.7-8-6-8-11.4V5.7l8-3.2Z" stroke="currentColor" stroke-width="1.3"/><path d="m8.2 11.8 2.5 2.5 5-5.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3 class="how-title">Protect the consumer</h3>
+            <p class="how-text">
+              Every verdict ends with concrete, plain-language steps: what not to click,
+              what not to share, how to verify independently and how to report a suspected
+              fraud.
+            </p>
+            <div class="how-tags"><span class="how-tag">Clear actions</span><span class="how-tag">Shareable</span><span class="how-tag">Local-first</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="coverage page-width" id="coverage">
+      <div>
+        <div class="section-kicker"><span class="line"></span> Coverage map</div>
+        <h2 class="coverage-title">Built for the scams<br />people actually face.</h2>
+        <p class="coverage-copy">
+          Not a generic text classifier. ScamShield is tuned to the consumer fraud playbook —
+          marketplace cons, bank phishing, parcel traps, fake reviews and high-pressure payment requests.
+        </p>
+        <div class="coverage-note">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.6 14 4v4.6c0 3.9-2.4 6.9-6 8.4-3.6-1.5-6-4.5-6-8.4V4l6-2.4Z" stroke="currentColor" stroke-width="1.15"/><path d="m5.4 8 1.8 1.8 3.5-3.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Explainable signals · Zero external AI APIs · Nothing leaves your server
+        </div>
+      </div>
+
+      <div class="coverage-grid">
+        <article class="coverage-item">
+          <svg class="coverage-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M3 8h14M7 12h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <h3 class="coverage-name">Fake storefronts</h3>
+          <p class="coverage-detail">Lookalike domains, raw IPs, risky TLDs and brand-to-domain mismatches.</p>
+          <span class="coverage-code">DOMAIN_INTEL</span>
+        </article>
+        <article class="coverage-item">
+          <svg class="coverage-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2 18 6v5c0 4-2.4 7.1-8 9-5.6-1.9-8-5-8-9V6l8-4Z" stroke="currentColor" stroke-width="1.2"/><path d="M7 10.2 9 12l4-4.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h3 class="coverage-name">Credential theft</h3>
+          <p class="coverage-detail">OTP, PIN, password, KYC and card-data requests tied to pressure tactics.</p>
+          <span class="coverage-code">CREDENTIAL_TRAP</span>
+        </article>
+        <article class="coverage-item">
+          <svg class="coverage-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m10 2.3 2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.6-4.8 2.6.9-5.4L2.2 8l5.4-.8L10 2.3Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          <h3 class="coverage-name">Review farms</h3>
+          <p class="coverage-detail">Incentivised praise, stacked superlatives and reviews without lived detail.</p>
+          <span class="coverage-code">REVIEW_FORENSICS</span>
+        </article>
+        <article class="coverage-item">
+          <svg class="coverage-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 6.2 10 2l7 4.2v7.6L10 18l-7-4.2V6.2Z" stroke="currentColor" stroke-width="1.2"/><path d="m3 6.2 7 4.1 7-4.1M10 10.3V18" stroke="currentColor" stroke-width="1.2"/></svg>
+          <h3 class="coverage-name">Parcel &amp; KYC traps</h3>
+          <p class="coverage-detail">Failed-delivery fees, customs pretexts and identity-update pressure.</p>
+          <span class="coverage-code">MESSAGE_SCOUT</span>
+        </article>
+        <article class="coverage-item">
+          <svg class="coverage-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7.3" stroke="currentColor" stroke-width="1.2"/><path d="M7.2 12.8c.9-2 1.3-4 1.3-5.8M12.8 7.2c-.9 2-1.3 4-1.3 5.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <h3 class="coverage-name">Payment red flags</h3>
+          <p class="coverage-detail">Gift cards, crypto, wire transfers and irreversible deposit demands.</p>
+          <span class="coverage-code">PAYMENT_RISK</span>
+        </article>
+        <article class="coverage-item">
+          <svg class="coverage-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3.5 13.5 8 9l2.8 2.8L16.5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.5 5h4v4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h3 class="coverage-name">Urgency engineering</h3>
+          <p class="coverage-detail">Manufactured deadlines, threats, secrecy and off-platform contact.</p>
+          <span class="coverage-code">PRESSURE_DETECT</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="final-cta page-width">
+      <div class="final-cta-copy">
+        <h3>Trust is not a click. Verify it.</h3>
+        <p>Run one suspicious message through ScamShield before it costs someone money.</p>
+      </div>
+      <a class="primary-link" href="#analyzer">
+        Analyze another sample
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h9M8.5 3.5 13 8l-4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-row page-width">
+      <div class="footer-brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none">
+            <path d="M16 2.8 26.8 7v8.5c0 7.2-4.4 12.9-10.8 15.7C9.6 28.4 5.2 22.7 5.2 15.5V7L16 2.8Z" stroke="#5ef0a7" stroke-width="1.2" opacity="0.7"/>
+            <path d="m11.4 15.9 3.1 3.1 6.4-6.7" stroke="#5ef0a7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span><strong>ScamShield AI</strong> · Consumer fraud sentinel · Built for AIgnite 2026</span>
+      </div>
+      <div class="footer-tech">
+        <span class="tech-pill">JAVA 11+</span>
+        <span class="tech-pill">ZERO DEPENDENCIES</span>
+        <span class="tech-pill">LOCAL-FIRST</span>
+        <span class="tech-pill">EXPLAINABLE SCORING</span>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.8 14 4v4.4c0 3.8-2.4 6.8-6 8.2-3.6-1.4-6-4.4-6-8.2V4l6-2.2Z" stroke="currentColor" stroke-width="1.2"/><path d="m5.4 8.1 1.7 1.7 3.5-3.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span id="toastText">Report copied to clipboard.</span>
+  </div>
+  <script>
+    (() => {
+      "use strict";
+
+      const $ = (selector, root = document) => root.querySelector(selector);
+      const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const numberFormat = new Intl.NumberFormat("en-US");
+
+      const SAMPLES = {
+        deal: {
+          type: "message",
+          content: "MEGA DEAL ALERT!!! 90% OFF luxury watches — ONLY TODAY! Limited stock, claim now before it expires. Pay via UPI or gift card to reserve yours. WhatsApp +91 98765 43210 to claim. Visit http://amaz0n-mega-deals.shop/claim"
+        },
+        phish: {
+          type: "message",
+          content: "URGENT: Your SBI account will be suspended within 24 hours due to incomplete KYC. Verify your identity and enter the OTP at http://sbi-kyc-verify.top/login to avoid a permanent block."
+        },
+        clean: {
+          type: "url",
+          content: "Official Amazon India store. Check the product details, seller ratings and return policy before buying. https://www.amazon.in/dp/B0CX23V2ZK"
+        },
+        review: {
+          type: "review",
+          content: "I received this product for free in exchange for a review. Honestly, it is the BEST product ever!!! 100% must buy, changed my life, 5 stars. Use my discount code SAVE50."
+        }
+      };
+
+      const TYPE_META = {
+        url: {
+          label: "Suspicious link",
+          placeholder: "Paste a checkout, product, login or account URL…",
+          source: "LINK"
+        },
+        review: {
+          label: "Product review",
+          placeholder: "Paste the product review that feels engineered…",
+          source: "REVIEW"
+        },
+        message: {
+          label: "Suspicious message",
+          placeholder: "Paste the SMS, WhatsApp message or email that feels off…",
+          source: "MESSAGE"
+        }
+      };
+
+      const STATUS_META = {
+        DANGER: {
+          lead: "Do not engage.",
+          risk: "This pattern can cause real loss.",
+          badge: "DANGER",
+          empty: "Do not click, pay or share sensitive information. Verify through an official app and report the attempt."
+        },
+        WARNING: {
+          lead: "Slow down.",
+          risk: "Verify before you act.",
+          badge: "WARNING",
+          empty: "Some signals are ambiguous. Verify independently before clicking, paying or sharing details."
+        },
+        SAFE: {
+          lead: "No obvious red flags.",
+          risk: "Still verify before paying.",
+          badge: "SAFE",
+          empty: "This sample did not trigger a meaningful fraud combination. The checks below still matter."
+        }
+      };
+
+      const state = {
+        type: "message",
+        busy: false,
+        data: null,
+        selectedSample: null,
+        toastTimer: null,
+        scoreFrame: null
+      };
+
+      const form = $("#scanForm");
+      const textarea = $("#contentInput");
+      const inputShell = $("#inputShell");
+      const inputLabel = $("#inputLabel");
+      const inputError = $("#inputError");
+      const charCount = $("#charCount");
+      const clearBtn = $("#clearBtn");
+      const pasteBtn = $("#pasteBtn");
+      const scanBtn = $("#scanBtn");
+      const typeButtons = $$(".type-btn");
+      const sampleButtons = $$(".sample-card");
+      const overlay = $("#scanOverlay");
+      const scanProgress = $("#scanProgress");
+      const scanSteps = $$(".scan-step");
+      const results = $("#results");
+      const toast = $("#toast");
+      const toastText = $("#toastText");
+      const scoreNumber = $("#scoreNumber");
+      const meterArc = $("#meterArc");
+      const statusBadge = $("#statusBadge");
+      const statusText = $("#statusText");
+      const scoreChips = $("#scoreChips");
+      const copyReportBtn = $("#copyReportBtn");
+      const newScanBtn = $("#newScanBtn");
+
+      const meterCircumference = 2 * Math.PI * 96;
+      meterArc.style.strokeDasharray = String(meterCircumference);
+      meterArc.style.strokeDashoffset = String(meterCircumference);
+
+      function showToast(message, isError = false) {
+        window.clearTimeout(state.toastTimer);
+        toastText.textContent = message;
+        toast.classList.toggle("error", isError);
+        toast.classList.add("show");
+        state.toastTimer = window.setTimeout(() => toast.classList.remove("show"), 3000);
+      }
+
+      function setInputError(message) {
+        inputError.textContent = message || "";
+        inputError.classList.toggle("show", Boolean(message));
+        inputShell.classList.toggle("is-error", Boolean(message));
+      }
+
+      function updateInputUI() {
+        const length = textarea.value.length;
+        charCount.textContent = numberFormat.format(length) + " / 6,000";
+        clearBtn.hidden = length === 0;
+        if (inputError.textContent && length > 2) setInputError("");
+      }
+
+      function setType(type, focusInput = false) {
+        if (!TYPE_META[type]) return;
+        state.type = type;
+        typeButtons.forEach((button) => {
+          button.setAttribute("aria-selected", String(button.dataset.type === type));
+        });
+        const meta = TYPE_META[type];
+        inputLabel.textContent = meta.label;
+        textarea.placeholder = meta.placeholder;
+        if (focusInput) textarea.focus();
+      }
+
+      function setBusy(busy) {
+        state.busy = busy;
+        scanBtn.disabled = busy;
+        textarea.readOnly = busy;
+        typeButtons.forEach((button) => { button.disabled = busy; });
+        sampleButtons.forEach((button) => { button.disabled = busy; });
+        form.setAttribute("aria-busy", String(busy));
+      }
+
+      function resetOverlaySteps() {
+        scanSteps.forEach((step, index) => {
+          step.classList.remove("done", "active");
+          if (index === 0) step.classList.add("active");
+        });
+        scanProgress.style.width = "5%";
+      }
+
+      function showOverlay() {
+        resetOverlaySteps();
+        $("#scanSub").textContent = "Running explainable heuristics";
+        overlay.classList.add("show");
+        overlay.setAttribute("aria-busy", "true");
+      }
+
+      function hideOverlay() {
+        overlay.classList.remove("show");
+        overlay.setAttribute("aria-busy", "false");
+      }
+
+      function completeOverlaySteps() {
+        scanSteps.forEach((step) => {
+          step.classList.remove("active");
+          step.classList.add("done");
+        });
+        scanProgress.style.width = "100%";
+      }
+
+      const sleep = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
+
+      async function runAnalysis() {
+        if (state.busy) return;
+        const content = textarea.value.trim();
+
+        if (content.length < 3) {
+          setInputError("Paste at least a few characters for ScamShield to inspect.");
+          textarea.focus();
+          return;
+        }
+        if (content.length > 6000) {
+          setInputError("Keep the sample under 6,000 characters.");
+          return;
+        }
+
+        setInputError("");
+        setBusy(true);
+        showOverlay();
+        const started = performance.now();
+        const overlayTimers = [
+          window.setTimeout(() => {
+            scanSteps[0].classList.remove("active");
+            scanSteps[0].classList.add("done");
+            scanSteps[1].classList.add("active");
+            scanProgress.style.width = "39%";
+          }, 320),
+          window.setTimeout(() => {
+            scanSteps[1].classList.remove("active");
+            scanSteps[1].classList.add("done");
+            scanSteps[2].classList.add("active");
+            scanProgress.style.width = "73%";
+          }, 760)
+        ];
+
+        try {
+          const response = await fetch("/api/analyze", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content, type: state.type })
+          });
+
+          let payload;
+          try {
+            payload = await response.json();
+          } catch (parseError) {
+            throw new Error("The scanner returned an unreadable response.");
+          }
+          if (!response.ok) {
+            throw new Error(payload && payload.error ? payload.error : "Analysis failed. Please try again.");
+          }
+
+          const elapsed = performance.now() - started;
+          if (elapsed < 1300) await sleep(1300 - elapsed);
+
+          state.data = payload;
+          overlayTimers.forEach((timer) => window.clearTimeout(timer));
+          completeOverlaySteps();
+          renderResult(payload);
+          await sleep(140);
+          hideOverlay();
+          setBusy(false);
+          window.setTimeout(() => {
+            results.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+          }, 120);
+        } catch (error) {
+          overlayTimers.forEach((timer) => window.clearTimeout(timer));
+          hideOverlay();
+          setBusy(false);
+          const message = error && error.message ? error.message : "Analysis failed. Please try again.";
+          setInputError(message);
+          showToast(message, true);
+        }
+      }
+
+      typeButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          setType(button.dataset.type, true);
+          state.selectedSample = null;
+          sampleButtons.forEach((sample) => sample.classList.remove("is-active"));
+        });
+      });
+
+      sampleButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          if (state.busy) return;
+          const sample = SAMPLES[button.dataset.sample];
+          if (!sample) return;
+          setType(sample.type);
+          textarea.value = sample.content;
+          updateInputUI();
+          state.selectedSample = button.dataset.sample;
+          sampleButtons.forEach((item) => item.classList.toggle("is-active", item === button));
+          setInputError("");
+          runAnalysis();
+        });
+      });
+
+      textarea.addEventListener("input", () => {
+        updateInputUI();
+        state.selectedSample = null;
+        sampleButtons.forEach((sample) => sample.classList.remove("is-active"));
+      });
+
+      textarea.addEventListener("keydown", (event) => {
+        if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+          event.preventDefault();
+          form.requestSubmit();
+        }
+      });
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        runAnalysis();
+      });
+
+      clearBtn.addEventListener("click", () => {
+        textarea.value = "";
+        updateInputUI();
+        setInputError("");
+        sampleButtons.forEach((sample) => sample.classList.remove("is-active"));
+        textarea.focus();
+      });
+
+      pasteBtn.addEventListener("click", async () => {
+        if (!navigator.clipboard || !navigator.clipboard.readText) {
+          showToast("Clipboard access is unavailable here. Paste manually.", true);
+          return;
+        }
+        try {
+          const text = await navigator.clipboard.readText();
+          if (!text) {
+            showToast("Your clipboard is empty.", true);
+            return;
+          }
+          textarea.value = text.slice(0, 6000);
+          updateInputUI();
+          setInputError("");
+          state.selectedSample = null;
+          sampleButtons.forEach((sample) => sample.classList.remove("is-active"));
+          textarea.focus();
+          showToast("Pasted from clipboard.");
+        } catch (error) {
+          showToast("Clipboard permission was denied. Paste manually.", true);
+        }
+      });
+
+      newScanBtn.addEventListener("click", () => {
+        results.hidden = true;
+        state.data = null;
+        textarea.value = "";
+        state.selectedSample = null;
+        sampleButtons.forEach((sample) => sample.classList.remove("is-active"));
+        setType("message");
+        updateInputUI();
+        setInputError("");
+        $("#analyzer").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+        window.setTimeout(() => textarea.focus(), reduceMotion ? 0 : 450);
+      });
+
+      function animateScore(target) {
+        const safeTarget = Math.max(0, Math.min(100, Number(target) || 0));
+        window.cancelAnimationFrame(state.scoreFrame);
+        scoreNumber.textContent = "0";
+        meterArc.style.strokeDashoffset = String(meterCircumference);
+
+        if (reduceMotion) {
+          scoreNumber.textContent = String(Math.round(safeTarget));
+          meterArc.style.strokeDashoffset = String(meterCircumference * (1 - safeTarget / 100));
+          return;
+        }
+
+        const started = performance.now();
+        const duration = 1250;
+        const tick = (now) => {
+          const progress = Math.min(1, (now - started) / duration);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const current = safeTarget * eased;
+          scoreNumber.textContent = String(Math.round(current));
+          meterArc.style.strokeDashoffset = String(meterCircumference * (1 - current / 100));
+          if (progress < 1) {
+            state.scoreFrame = window.requestAnimationFrame(tick);
+          }
+        };
+        state.scoreFrame = window.requestAnimationFrame(tick);
+      }
+
+      function renderResult(data) {
+        const meta = STATUS_META[data.status] || STATUS_META.WARNING;
+        results.hidden = false;
+        results.dataset.status = data.status;
+
+        $("#reportId").textContent = data.reportId || "SS-UNKNOWN";
+        $("#reportTime").textContent = data.analyzedAt || "Just now";
+        $("#reportEngine").textContent = "H-ENGINE v1.0" +
+          (data.processingMs ? " · " + data.processingMs + "MS" : "");
+
+        statusText.textContent = meta.badge;
+        $("#scoreHeadline").textContent = data.headline || meta.lead;
+        $("#scoreSummary").textContent = data.summary || "";
+        $("#confidenceValue").textContent = (data.confidence || 88) + "%";
+
+        $("#guidanceLead").textContent = meta.lead;
+        $("#guidanceRisk").textContent = meta.risk;
+        $("#recommendationText").textContent = data.recommendation || "";
+
+        const actionList = $("#actionList");
+        actionList.innerHTML = "";
+        (data.actions || []).slice(0, 3).forEach((action, index) => {
+          const item = document.createElement("li");
+          item.className = "action-item";
+
+          const num = document.createElement("span");
+          num.className = "action-num";
+          num.textContent = String(index + 1).padStart(2, "0");
+
+          const text = document.createElement("span");
+          text.className = "action-text";
+          text.textContent = action;
+
+          item.append(num, text);
+          actionList.append(item);
+        });
+
+        const typeMeta = TYPE_META[data.inputType] || TYPE_META.message;
+        const metrics = data.metrics || {};
+        const details = Array.isArray(data.details) ? data.details : [];
+        const breakdown = Array.isArray(data.breakdown) ? data.breakdown : [];
+        const rawPoints = breakdown.reduce((sum, row) => sum + (Number(row.points) || 0), 0);
+
+        scoreChips.innerHTML = "";
+        const chipValues = [
+          typeMeta.source,
+          (metrics.linksInspected || 0) + " LINKS",
+          details.length + " SIGNALS",
+          (data.confidence || 88) + "% CONF"
+        ];
+        chipValues.forEach((value) => {
+          const chip = document.createElement("span");
+          chip.className = "score-chip";
+          chip.textContent = value;
+          scoreChips.append(chip);
+        });
+
+        renderBreakdown(breakdown);
+        renderSignals(details, data);
+        renderSafeChecks(data);
+
+        $("#breakdownPoints").textContent = numberFormat.format(rawPoints) + " PTS";
+        $("#signalsCount").textContent = details.length + " SIGNAL" + (details.length === 1 ? "" : "S");
+        $("#safeEmptyText").textContent = meta.empty;
+
+        animateScore(data.score);
+      }
+
+      function renderBreakdown(breakdown) {
+        const list = $("#breakdownList");
+        list.innerHTML = "";
+        const rows = breakdown.length
+          ? breakdown
+          : [{ label: "No weighted risk signals", points: 0 }];
+        const maxPoints = Math.max(1, ...rows.map((row) => Number(row.points) || 0));
+
+        rows.forEach((row, index) => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "breakdown-row";
+
+          const meta = document.createElement("div");
+          meta.className = "breakdown-meta";
+
+          const label = document.createElement("span");
+          label.className = "breakdown-label";
+          label.textContent = row.label || "Risk signal";
+
+          const points = document.createElement("span");
+          points.className = "breakdown-points";
+          points.textContent = (Number(row.points) || 0) + " PTS";
+
+          meta.append(label, points);
+
+          const track = document.createElement("div");
+          track.className = "bar-track";
+          const fill = document.createElement("div");
+          fill.className = "bar-fill";
+          track.append(fill);
+
+          wrapper.append(meta, track);
+          list.append(wrapper);
+
+          const targetWidth = Math.max(3, Math.round(((Number(row.points) || 0) / maxPoints) * 100));
+          window.setTimeout(() => {
+            fill.style.width = targetWidth + "%";
+          }, reduceMotion ? 0 : 180 + index * 70);
+        });
+      }
+
+      function renderSignals(details, data) {
+        const grid = $("#signalGrid");
+        const safeEmpty = $("#safeEmpty");
+        grid.innerHTML = "";
+        grid.hidden = details.length === 0;
+        safeEmpty.hidden = details.length !== 0;
+
+        details.forEach((signal, index) => {
+          const item = document.createElement("article");
+          item.className = "signal-item";
+          item.dataset.severity = signal.severity || "LOW";
+          item.style.animationDelay = (reduceMotion ? 0 : index * 45) + "ms";
+
+          const top = document.createElement("div");
+          top.className = "signal-top";
+
+          const severity = document.createElement("span");
+          severity.className = "signal-severity";
+          const dot = document.createElement("span");
+          dot.className = "sev-dot";
+          severity.append(dot, document.createTextNode((signal.severity || "LOW") + " RISK"));
+
+          const points = document.createElement("span");
+          points.className = "signal-points";
+          points.textContent = "+" + (signal.points || 0) + " PTS";
+
+          top.append(severity, points);
+
+          const title = document.createElement("h4");
+          title.className = "signal-title";
+          title.textContent = signal.title || "Fraud signal";
+
+          const desc = document.createElement("p");
+          desc.className = "signal-desc";
+          desc.textContent = signal.description || "";
+
+          item.append(top, title, desc);
+          grid.append(item);
+        });
+
+        $("#signalsCount").textContent = details.length + " SIGNAL" + (details.length === 1 ? "" : "S");
+      }
+
+      function renderSafeChecks(data) {
+        const block = $("#safeChecksBlock");
+        const list = $("#safeChecksList");
+        const checks = Array.isArray(data.safeChecks) ? data.safeChecks : [];
+        list.innerHTML = "";
+
+        if (!checks.length || data.status === "DANGER") {
+          block.hidden = true;
+          return;
+        }
+
+        checks.forEach((check) => {
+          const item = document.createElement("li");
+          item.className = "safe-check";
+          item.innerHTML = '<svg viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="m2 5.1 1.9 1.9L8 3.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+          item.append(document.createTextNode(check));
+          list.append(item);
+        });
+        block.hidden = false;
+      }
+
+      function buildReportText() {
+        const data = state.data;
+        if (!data) return "";
+        const details = Array.isArray(data.details) ? data.details : [];
+        const actions = Array.isArray(data.actions) ? data.actions : [];
+        const checks = Array.isArray(data.safeChecks) ? data.safeChecks : [];
+
+        const lines = [
+          "SCAMSHIELD AI — THREAT INTELLIGENCE REPORT",
+          "==========================================",
+          "Report ID : " + (data.reportId || "—"),
+          "Verdict   : " + data.status + " · " + data.score + "/100",
+          "Confidence: " + (data.confidence || 88) + "%",
+          "Input     : " + (TYPE_META[data.inputType] || TYPE_META.message).source,
+          "Scanned   : " + (data.analyzedAt || "—"),
+          "Engine    : " + (data.engine || "ScamShield Heuristic Engine"),
+          "",
+          "VERDICT",
+          data.headline || "",
+          data.summary || "",
+          "",
+          "RECOMMENDED ACTION",
+          data.recommendation || "",
+          ""
+        ];
+
+        actions.forEach((action, index) => {
+          lines.push((index + 1) + ". " + action);
+        });
+
+        lines.push("", "DETECTED SIGNALS (" + details.length + ")");
+        if (details.length) {
+          details.forEach((signal) => {
+            lines.push("• [" + signal.severity + "] " + signal.title + " (+" + signal.points + " pts)");
+            lines.push("  " + signal.description);
+          });
+        } else {
+          lines.push("• No meaningful fraud pattern was detected.");
+        }
+
+        if (checks.length) {
+          lines.push("", "WHAT CHECKED OUT");
+          checks.forEach((check) => lines.push("✓ " + check));
+        }
+
+        lines.push(
+          "",
+          "This heuristic report is consumer guidance, not a legal or financial guarantee.",
+          "Verify independently before paying. Never share OTPs, PINs or passwords.",
+          "Generated locally by ScamShield AI."
+        );
+        return lines.join("\n");
+      }
+
+      async function copyText(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          try {
+            await navigator.clipboard.writeText(text);
+            return true;
+          } catch (error) {
+            // Fall through to the legacy copy path.
+          }
+        }
+        try {
+          const helper = document.createElement("textarea");
+          helper.value = text;
+          helper.setAttribute("readonly", "");
+          helper.style.position = "fixed";
+          helper.style.left = "-9999px";
+          helper.style.top = "0";
+          document.body.append(helper);
+          helper.select();
+          const copied = document.execCommand("copy");
+          helper.remove();
+          return copied;
+        } catch (error) {
+          return false;
+        }
+      }
+
+      copyReportBtn.addEventListener("click", async () => {
+        if (!state.data) {
+          showToast("Run a scan before copying a report.", true);
+          return;
+        }
+        const copied = await copyText(buildReportText());
+        if (!copied) {
+          showToast("Copy failed. Your browser blocked clipboard access.", true);
+          return;
+        }
+        copyReportBtn.classList.add("copied");
+        const originalMarkup = copyReportBtn.innerHTML;
+        copyReportBtn.textContent = "Report copied";
+        showToast("Shareable risk report copied to clipboard.");
+        window.setTimeout(() => {
+          copyReportBtn.classList.remove("copied");
+          copyReportBtn.innerHTML = originalMarkup;
+        }, 2200);
+      });
+
+      function initCanvasNetwork() {
+        const canvas = $("#network");
+        if (!canvas) return;
+        const context = canvas.getContext("2d");
+        if (!context) return;
+
+        let width = 0;
+        let height = 0;
+        let dpr = 1;
+        let nodes = [];
+        let animationId = null;
+        const pointer = {
+          x: -1000,
+          y: -1000,
+          targetX: -1000,
+          targetY: -1000,
+          active: false
+        };
+        const palette = [
+          [94, 240, 167],
+          [34, 230, 255],
+          [159, 124, 255],
+          [92, 150, 255]
+        ];
+
+        function makeNode() {
+          const color = palette[Math.floor(Math.random() * palette.length)];
+          return {
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 0.32,
+            vy: (Math.random() - 0.5) * 0.32,
+            radius: 0.65 + Math.random() * 1.2,
+            color: color,
+            alpha: 0.26 + Math.random() * 0.34
+          };
+        }
+
+        function buildNodes() {
+          const target = Math.max(34, Math.min(102, Math.floor((width * height) / 16500)));
+          nodes = Array.from({ length: target }, makeNode);
+        }
+
+        function resize() {
+          width = window.innerWidth;
+          height = window.innerHeight;
+          dpr = Math.min(window.devicePixelRatio || 1, 2);
+          canvas.width = Math.floor(width * dpr);
+          canvas.height = Math.floor(height * dpr);
+          canvas.style.width = width + "px";
+          canvas.style.height = height + "px";
+          context.setTransform(dpr, 0, 0, dpr, 0, 0);
+          buildNodes();
+          if (reduceMotion) drawFrame(false);
+        }
+
+        function drawConnections(linkDistance) {
+          for (let i = 0; i < nodes.length; i++) {
+            const a = nodes[i];
+            for (let j = i + 1; j < nodes.length; j++) {
+              const b = nodes[j];
+              const dx = a.x - b.x;
+              const dy = a.y - b.y;
+              const distanceSq = dx * dx + dy * dy;
+              if (distanceSq > linkDistance * linkDistance) continue;
+              const distance = Math.sqrt(distanceSq);
+              const alpha = (1 - distance / linkDistance) * 0.13;
+              context.beginPath();
+              context.moveTo(a.x, a.y);
+              context.lineTo(b.x, b.y);
+              context.strokeStyle = "rgba(105, 180, 220, " + alpha + ")";
+              context.lineWidth = 0.65;
+              context.stroke();
+            }
+          }
+        }
+
+        function drawPointerConnections() {
+          if (!pointer.active) return;
+          const reach = width < 720 ? 120 : 175;
+          for (const node of nodes) {
+            const dx = node.x - pointer.x;
+            const dy = node.y - pointer.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance > reach) continue;
+            const alpha = (1 - distance / reach) * 0.22;
+            context.beginPath();
+            context.moveTo(pointer.x, pointer.y);
+            context.lineTo(node.x, node.y);
+            context.strokeStyle = "rgba(94, 240, 210, " + alpha + ")";
+            context.lineWidth = 0.8;
+            context.stroke();
+          }
+        }
+
+        function drawPointerGlow() {
+          if (!pointer.active) return;
+          const glow = context.createRadialGradient(pointer.x, pointer.y, 0, pointer.x, pointer.y, 220);
+          glow.addColorStop(0, "rgba(34, 230, 255, 0.055)");
+          glow.addColorStop(0.45, "rgba(94, 240, 167, 0.018)");
+          glow.addColorStop(1, "rgba(34, 230, 255, 0)");
+          context.fillStyle = glow;
+          context.fillRect(pointer.x - 220, pointer.y - 220, 440, 440);
+        }
+
+        function drawNodes() {
+          for (const node of nodes) {
+            const [r, g, b] = node.color;
+            context.beginPath();
+            context.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+            context.fillStyle = "rgba(" + r + "," + g + "," + b + "," + node.alpha + ")";
+            context.fill();
+          }
+        }
+
+        function updateNodes() {
+          for (const node of nodes) {
+            if (pointer.active) {
+              const dx = node.x - pointer.x;
+              const dy = node.y - pointer.y;
+              const distanceSq = dx * dx + dy * dy;
+              const reach = width < 720 ? 115 : 155;
+              if (distanceSq > 0.1 && distanceSq < reach * reach) {
+                const distance = Math.sqrt(distanceSq);
+                const force = (1 - distance / reach) * 0.045;
+                node.vx += (dx / distance) * force;
+                node.vy += (dy / distance) * force;
+              }
+            }
+
+            node.x += node.vx;
+            node.y += node.vy;
+            node.vx *= 0.994;
+            node.vy *= 0.994;
+
+            const speed = Math.sqrt(node.vx * node.vx + node.vy * node.vy);
+            if (speed < 0.045) {
+              node.vx += (Math.random() - 0.5) * 0.012;
+              node.vy += (Math.random() - 0.5) * 0.012;
+            }
+            const maxSpeed = 0.72;
+            if (Math.abs(node.vx) > maxSpeed) node.vx = Math.sign(node.vx) * maxSpeed;
+            if (Math.abs(node.vy) > maxSpeed) node.vy = Math.sign(node.vy) * maxSpeed;
+
+            if (node.x < -30) node.x = width + 30;
+            if (node.x > width + 30) node.x = -30;
+            if (node.y < -30) node.y = height + 30;
+            if (node.y > height + 30) node.y = -30;
+          }
+        }
+
+        function drawFrame(update) {
+          context.clearRect(0, 0, width, height);
+          const linkDistance = width < 720 ? 105 : 142;
+          if (update) updateNodes();
+          drawConnections(linkDistance);
+          drawPointerConnections();
+          drawNodes();
+          drawPointerGlow();
+        }
+
+        function animate() {
+          pointer.x += (pointer.targetX - pointer.x) * 0.075;
+          pointer.y += (pointer.targetY - pointer.y) * 0.075;
+          drawFrame(true);
+          animationId = window.requestAnimationFrame(animate);
+        }
+
+        window.addEventListener("pointermove", (event) => {
+          pointer.targetX = event.clientX;
+          pointer.targetY = event.clientY;
+          if (!pointer.active) {
+            pointer.x = event.clientX;
+            pointer.y = event.clientY;
+            pointer.active = true;
+          }
+        }, { passive: true });
+
+        document.addEventListener("pointerleave", () => {
+          pointer.active = false;
+        });
+
+        window.addEventListener("resize", resize, { passive: true });
+        resize();
+
+        if (!reduceMotion) {
+          if (animationId) window.cancelAnimationFrame(animationId);
+          animate();
+        }
+      }
+
+      function initTilt() {
+        if (reduceMotion) return;
+        const hoverQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+        $$(".tilt").forEach((card) => {
+          card.addEventListener("pointermove", (event) => {
+            if (!hoverQuery.matches) return;
+            const rect = card.getBoundingClientRect();
+            const px = (event.clientX - rect.left) / rect.width - 0.5;
+            const py = (event.clientY - rect.top) / rect.height - 0.5;
+            const rotateX = (-py * 3.4).toFixed(2);
+            const rotateY = (px * 3.4).toFixed(2);
+            card.style.transform = "perspective(1000px) rotateX(" + rotateX + "deg) rotateY(" + rotateY + "deg) translateY(-2px)";
+          });
+          card.addEventListener("pointerleave", () => {
+            card.style.transform = "";
+          });
+        });
+      }
+
+      setType("message");
+      updateInputUI();
+      initCanvasNetwork();
+      initTilt();
+
+      // Warm the engine so the first live scan feels instant.
+      fetch("/api/health", { cache: "no-store" }).catch(() => {
+        const pill = $(".engine-pill");
+        if (pill) {
+          pill.innerHTML = '<span class="engine-dot" style="background:#ff4d6d;box-shadow:0 0 10px #ff4d6d"></span> ENGINE OFFLINE';
+        }
+      });
+    })();
+  </script>
+
+</body>
+</html>
